@@ -1,199 +1,923 @@
-"""LLM-based dataset analysis"""
-import json
-import traceback
-import pandas as pd
-from core.data_profiler import ColumnProfile
-from core.config import DashboardConfig, FilterConfig, KPIConfig, ChartConfig
-from core.schemas import DashboardConfigModel
-from typing import Dict, Optional
-import sys
+PAGE_CONFIG LOADED
+[OK] Loading active user upload: .cache/user_uploads\20260618-145058-39cc6da1.pkl
+[OK] Loaded 4,205 rows x 31 cols from user upload
+  - Client Name: categorical (cardinality=1202, missing=0.2%)
+  - Marsha: categorical (cardinality=555, missing=57.6%)
+  - Property Name: categorical (cardinality=451, missing=77.3%)
+  - Invoice No: categorical (cardinality=4198, missing=0.2%)
+  - Invoice Date: temporal (cardinality=528, missing=0.2%)
+  - Due Days: numeric (cardinality=528, missing=0.2%)
+  - Revenue Head: categorical (cardinality=26, missing=8.3%)
+  - Nature of Services: categorical (cardinality=6, missing=8.3%)
+  - Service: categorical (cardinality=48, missing=0.2%)
+  - Invoice Amount: numeric (cardinality=2017, missing=0.1%)
+  - Below 30 Days: numeric (cardinality=843, missing=0.1%)
+  - Overdue 30 - 60 Days: numeric (cardinality=440, missing=0.2%)
+  - Overdue 60 - 180 Days: numeric (cardinality=502, missing=0.2%)
+  - Overdue Above 180 Days: numeric (cardinality=249, missing=0.2%)
+  - Above 1 year: numeric (cardinality=292, missing=0.2%)
+  - Balance Collection Amount: numeric (cardinality=401, missing=0.2%)
+  - Credit Note Issued: numeric (cardinality=4, missing=0.2%)
+  - Balance Amount: numeric (cardinality=2376, missing=0.2%)
+  - Unnamed: 18: numeric (cardinality=173, missing=79.5%)
+  - Forex Balance Amount: numeric (cardinality=209, missing=0.2%)
+  - Particulars: categorical (cardinality=3881, missing=0.2%)
+  - Manager: categorical (cardinality=79, missing=0.2%)
+  - Partner: categorical (cardinality=10, missing=0.2%)
+  - Department: categorical (cardinality=8, missing=0.2%)
+  - Company Group: categorical (cardinality=5, missing=0.2%)
+  - Group: categorical (cardinality=275, missing=0.2%)
+  - Contact Person Name: categorical (cardinality=1194, missing=8.7%)
+  - Brand Name: categorical (cardinality=19, missing=98.1%)
+  - Project MID: categorical (cardinality=1881, missing=10.2%)
+  - Country: categorical (cardinality=43, missing=0.2%)
+  - GST NO: numeric (cardinality=569, missing=0.2%)
+[OK] Profiles cached to D:\veena.sharma\My Documents\GIT REPOSITORY\AI-Dashboard\.cache\profiles.json
 
-class LLMAnalyzer:
-    """Analyze dataset using LLM provider"""
+[INFO] Phase 1-2: Generating auto-layout...
+[OK] Generated comprehensive dashboard:
+  - Filters: 5
+  - KPIs: 4
+  - Charts: 12 (analyzing all column types)
+  - Layout: 3-col
+[OK] Auto-generated 12 charts, 5 filters, 4 KPIs
 
-    def __init__(self, provider=None, config=None):
-        self.provider = provider
-        self.config = config
+[WARN] Data Quality Issues:
+  - Marsha has 57.6% missing values
+  - Property Name has 77.3% missing values
+  - Unnamed: 18 has 79.5% missing values
+  - Brand Name has 98.1% missing values
+  - Due Days contains outliers (range: (3.0, 2180.0))
+  - Invoice Amount contains outliers (range: (0.0, 4588996.0))
+  - Below 30 Days contains outliers (range: (0.0, 4588996.0))
+  - Overdue 30 - 60 Days contains outliers (range: (0.0, 3466202.0))
+  - Overdue 60 - 180 Days contains outliers (range: (0.0, 1588918.98))
+  - Overdue Above 180 Days contains outliers (range: (0.0, 955800.0))
+  - Above 1 year contains outliers (range: (0.0, 575250.0))
+  - Balance Collection Amount contains outliers (range: (-3460974.0, 0.0))
+  - Credit Note Issued contains outliers (range: (-59590.0, 0.0))
+  - Balance Amount contains outliers (range: (-325914.44, 4568009.0))
+  - Unnamed: 18 contains outliers (range: (-91.7922933333333, 122.54))
+  - Forex Balance Amount contains outliers (range: (-3690.0, 17809.0))
 
-    def analyze(self, df: pd.DataFrame,
-                profiles: Dict[str, ColumnProfile],
-                user_context: str = None) -> DashboardConfig:
-        """Analyze dataset with LLM"""
+[OK] Found llm_config.json at: llm_config.json
+[OK] Loaded LLM config: provider=ollama
 
-        if not self.provider:
-            print("[INFO] No LLM provider configured. Skipping LLM analysis.")
-            return None
+[INFO] Phase 3: Analyzing with LLM...
+[INFO] Using provider: ollama at https://ollama.osourceglobal.com:11434
+[INFO] Creating LLM provider and analyzer...
+[OK] LLM analyzer created successfully
+[INFO] Running startup LLM analysis...
+[INFO] Sending data to LLM for analysis...
 
-        try:
-            # 1. Prepare data
-            profiles_json = self._profiles_to_json(profiles)
-            sample_data = self._sample_to_string(df)
+===PROMPT PREVIEW===
+You are a McKinsey-level data analytics consultant. Analyze this dataset comprehensively and generate a professional dashboard configuration with executive insights.
 
-            print("[INFO] Sending data to LLM for analysis...")
+CONTEXT: Dataset contains 4,205 records with 31 columns.
 
-            # 2. Call LLM
-            response = self.provider.analyze_dataset(
-                profiles_json,
-                sample_data,
-                user_context,
-                self.config.include_sample_data if self.config else True
-            )
-            print("\n====RAW LLM RESPONSE====")
-            print(response)
-            print("===========================")
+COLUMN PROFILES:
+{
+  "Client Name": {
+    "dtype": "categorical",
+    "cardinality": 1202,
+    "missing_pct": 0.2,
+    "range": null,
+    "top_values": [
+      "GRASIM INDS LTD",
+      "DUET INDIA HOTELS (CHENNAI OMR) PVT. LTD.",
+      "GRASIM INDUSTRIES LIMITED",
+      "PALLAZZIO HOTELS & LEISURE LTD.",
+      "GRASIM INDUSTRIES LIMITED, STAPLE FIBRE DIVISION, NAGDA"
+    ],
+    "is_temporal": false,
+    "has_outliers": false
+  },
+  "Marsha": {
+    "dtype": "categorical",
+    "cardinality": 555,
+    "missing_pct": 57.6,
+    "range": null,
+    "top_values": [
+      "MAAFO",
+      "BOMXR",
+      "IDRSI",
+      "DEDFI",
+      "."
+    ],
+    "is_temporal": false,
+    "has_outliers": false
+  },
+  "Property Name": {
+    "dtype": "categorical",
+    "cardinality": 451,
+    "missing_pct": 77.3,
+    "range": null,
+    "top_values": [
+      "Four Points by Sheraton Chennai OMR",
+      "The St. Regis Mumbai",
+      "Fairfield By Marriott Dehradun",
+      "FAIRFIELD BY MARRIOTT JAIPUR TONK ROAD",
+      "COURTYARD BY MARRIOTT RANCHI"
+    ],
+    "is_temporal": false,
+    "has_outliers": false
+  },
+  "Invoice No": {
+    "dtype": "categorical",
+    "cardinality": 4198,
+    "missing_pct": 0.2,
+    "range": null,
+    "top_values": [
+      "OSO2526-27011449",
+      "OSO2526-27040019",
+      "OSO2526-27040020",
+      "OSO2526-27011602",
+      "OSO2526-27020476"
+    ],
+    "is_temporal": false,
+    "has_outliers": false
+  },
+  "Invoice Date": {
+    "dtype": "temporal",
+    "cardinality": 528,
+    "missing_pct": 0.2,
+    "range": null,
+    "top_values": [
+      "2026-02-05",
+      "2026-03-06",
+      "2026-03-09",
+      "2026-03-05",
+      "2026-02-04"
+    ],
+    "is_temporal": true,
+    "has_outliers": false
+  },
+  "Due Days": {
+    "dtype": "numeric",
+    "cardinality": 528,
+    "missing_pct": 0.2,
+    "range": [
+      3.0,
+      2180.0
+    ],
+    "top_values": [
+      "39.0",
+      "10.0",
+      "7.0",
+      "11.0",
+      "40.0"
+    ],
+    "is_temporal": false,
+    "has_outliers": "True"
+  },
+  "Revenue Head": {
+    "dtype": "categorical",
+    "cardinality": 26,
+    "missing_pct": 8.3,
+    "range": null,
+    "top_values": [
+      "Payroll Management",
+      "SAM",
+      "DMS",
+      "HRMS",
+      "Recon Tool"
+    ],
+    "is_temporal": false,
+    "has_outliers": false
+  },
+  "Nature of Services": {
+    "dtype": "categorical",
+    "cardinality": 6,
+    "missing_pct": 8.3,
+    "range": null,
+    "top_values": [
+      "Local",
+      "Export",
+      "Exempt",
+      "ON ACCOUNT",
+      "LOCAL"
+    ],
+    "is_temporal": false,
+    "has_outliers": false
+  },
+  "Service": {
+    "dtype": "categorical",
+    "cardinality": 48,
+    "missing_pct": 0.2,
+    "range": null,
+    "top_values": [
+      "PAYROLL",
+      "GREEN SAM",
+      "HRMS",
+      "ON ACCOUNT",
 
-            if not response or response == "{}":
-                print("[WARN] LLM returned empty response")
-                return None
+===END PROMPT===
 
-            # 3. Parse response
-            config_dict = self.provider.extract_json_response(response)
-            print("\n====CONFIG_DICT====")
-            print(config_dict)
-            print("======================")
+[INFO] Calling Ollama at https://ollama.osourceglobal.com:11434...
+[INFO] Using model: qwen2.5:14b
+[INFO] Testing connectivity (10s timeout)...
+[OK] Ollama server is responding
+[INFO] Sending analysis request (timeout: 300s)...
+[DEBUG] Response status: 200
 
-            if not config_dict:
-                print("[WARN] Could not extract JSON from LLM response")
-                return None
+===OLLAMA RESPONSE===
+{
+  "executive_summary": {
+    "key_findings": [
+      "Invoice Amount declined YoY in Q3, indicating a potential revenue drop",
+      "Data completeness is at 97.6%, with minimal missing data across columns",
+      "Most invoice transactions are concentrated among a few key countries"
+    ],
+    "data_quality_score": 0.92,
+    "overall_health": "Healthy",
+    "missing_data_pct": 1.5,
+    "reliability": "High"
+  },
+  "trends": [
+    {"column": "Invoice Amount", "direction": "decreasing", "growth_rate": -0.08},
+    {"column": "Country", "direction": "stable", "growth_rate": 0}
+  ],
+  "data_quality": {
+    "missing_values": {"Invoice Date": 1, "Country": 1},
+    "outliers_detected": false,
+    "data_completeness": 0.98,
+    "recommendation": "Data quality is high; proceed with confidence"
+  },
+  "insights": [
+    "A significant drop in invoice amounts suggests potential operational issues or market challenges",
+    "Concentration of transactions in a few countries indicates regional focus and importance"
+  ],
+  "recommendations": [
+    "Analyze the root causes behind the decline in Invoice Amounts, focusing on specific regions or products",
+    "Enhance sales efforts in underperforming geographic areas to balance revenue distribution"
+  ],
+  "filters": [
+    {"column": "Country", "filter_type": "dropdown", "label": "Country"},
+    {"column": "Invoice Date", "filter_type": "range", "label": "Date Range"}
+  ],
+  "kpis": [
+    {"metric": "Invoice Amount", "aggregation": "sum", "label": "$Total Invoice Amounts"},
+    {"metric": "count", "aggregation": "count", "label": "Number of Invoices"}
+  ],
+  "charts": [
+    {
+      "chart_id": "chart-0",
+      "type": "line",
+      "x": "Invoice Date",
+      "y": "Invoice Amount",
+      "title": "Trend in Invoice Amounts Over Time",
+      "size": "full"
+    },
+    {
+      "chart_id": "chart-1",
+      "type": "bar",
+      "x": "Country",
+      "y": "Invoice Amount",
+      "title": "Total Invoice Amount by Country",
+      "size": "1/2"
+    }
+  ],
+  "layout_grid": "2-col",
+  "narrative": "This dashboard highlights the trend in invoice amounts over time, identifies key countries driving revenue, and provides filters for deeper analysis."
+}
+=====================
 
-            print("[OK] LLM analysis successful")
-            print(f"[INFO] LLM suggested: {len(config_dict.get('filters', []))} filters, {len(config_dict.get('kpis', []))} KPIs, {len(config_dict.get('charts', []))} charts")
+[OK] Ollama response received
 
-            # 4. Convert to DashboardConfig with validation
-            return self._dict_to_config(config_dict, df)
-        
-        
-        except Exception as e:
-            print("\n=====FULL TRACEBACK====")
-            traceback.print_exc()
-            print("=========================")
-            return None
-        
-        # except Exception as e:
-        #     print(f"[ERROR] LLM analysis failed: {e}")
-        #     return None
+====RAW LLM RESPONSE====
+{
+  "executive_summary": {
+    "key_findings": [
+      "Invoice Amount declined YoY in Q3, indicating a potential revenue drop",
+      "Data completeness is at 97.6%, with minimal missing data across columns",
+      "Most invoice transactions are concentrated among a few key countries"
+    ],
+    "data_quality_score": 0.92,
+    "overall_health": "Healthy",
+    "missing_data_pct": 1.5,
+    "reliability": "High"
+  },
+  "trends": [
+    {"column": "Invoice Amount", "direction": "decreasing", "growth_rate": -0.08},
+    {"column": "Country", "direction": "stable", "growth_rate": 0}
+  ],
+  "data_quality": {
+    "missing_values": {"Invoice Date": 1, "Country": 1},
+    "outliers_detected": false,
+    "data_completeness": 0.98,
+    "recommendation": "Data quality is high; proceed with confidence"
+  },
+  "insights": [
+    "A significant drop in invoice amounts suggests potential operational issues or market challenges",
+    "Concentration of transactions in a few countries indicates regional focus and importance"
+  ],
+  "recommendations": [
+    "Analyze the root causes behind the decline in Invoice Amounts, focusing on specific regions or products",
+    "Enhance sales efforts in underperforming geographic areas to balance revenue distribution"
+  ],
+  "filters": [
+    {"column": "Country", "filter_type": "dropdown", "label": "Country"},
+    {"column": "Invoice Date", "filter_type": "range", "label": "Date Range"}
+  ],
+  "kpis": [
+    {"metric": "Invoice Amount", "aggregation": "sum", "label": "$Total Invoice Amounts"},
+    {"metric": "count", "aggregation": "count", "label": "Number of Invoices"}
+  ],
+  "charts": [
+    {
+      "chart_id": "chart-0",
+      "type": "line",
+      "x": "Invoice Date",
+      "y": "Invoice Amount",
+      "title": "Trend in Invoice Amounts Over Time",
+      "size": "full"
+    },
+    {
+      "chart_id": "chart-1",
+      "type": "bar",
+      "x": "Country",
+      "y": "Invoice Amount",
+      "title": "Total Invoice Amount by Country",
+      "size": "1/2"
+    }
+  ],
+  "layout_grid": "2-col",
+  "narrative": "This dashboard highlights the trend in invoice amounts over time, identifies key countries driving revenue, and provides filters for deeper analysis."
+}
+===========================
 
-    def _profiles_to_json(self, profiles: Dict) -> str:
-        """Convert ColumnProfile dict or plain dict to JSON"""
-        data = {}
-        for name, profile in profiles.items():
-            if isinstance(profile, dict):
-                data[name] = {
-                    'dtype': profile.get('dtype', 'unknown'),
-                    'cardinality': profile.get('cardinality', 0),
-                    'missing_pct': round(profile.get('missing_pct', 0.0), 1),
-                    'range': profile.get('value_range'),
-                    'top_values': (profile.get('top_values') or [])[:5],
-                    'is_temporal': profile.get('is_temporal', False),
-                    'has_outliers': profile.get('has_outliers', False),
-                }
-            else:
-                data[name] = {
-                    'dtype': profile.dtype,
-                    'cardinality': profile.cardinality,
-                    'missing_pct': round(profile.missing_pct, 1),
-                    'range': profile.value_range,
-                    'top_values': profile.top_values[:5],
-                    'is_temporal': profile.is_temporal,
-                    'has_outliers': profile.has_outliers,
-                }
-        return json.dumps(data, indent=2, default=str)
+====CHARTS FROM LLM====
+[{'chart_id': 'chart-0', 'type': 'line', 'x': 'Invoice Date', 'y': 'Invoice Amount', 'title': 'Trend in Invoice Amounts Over Time', 'size': 'full'}, {'chart_id': 'chart-1', 'type': 'bar', 'x': 'Country', 'y': 'Invoice Amount', 'title': 'Total Invoice Amount by Country', 'size': '1/2'}]
+====================
 
-    def _sample_to_string(self, df: pd.DataFrame) -> str:
-        """Format sample data as string"""
-        return df.head(5).to_string()
 
-    
-    def _dict_to_config(self, config_dict: dict, df: pd.DataFrame = None) -> Optional[DashboardConfig]:
-        """Convert dict to DashboardConfig with validation"""
-        try:
-            import json
-            print("\n====CONFIG_DICT====")
-            print(json.dumps(config_dict, indent=2))
-            print("=======================\n")
-            
-            valid_columns = set(df.columns) if df is not None else set()
+====CONFIG_DICT====
+{'executive_summary': {'key_findings': ['Invoice Amount declined YoY in Q3, indicating a potential revenue drop', 'Data completeness is at 97.6%, with minimal missing data across columns', 'Most invoice transactions are concentrated among a few key countries'], 'data_quality_score': 0.92, 'overall_health': 'Healthy', 'missing_data_pct': 1.5, 'reliability': 'High'}, 'trends': [{'column': 'Invoice Amount', 'direction': 'decreasing', 'growth_rate': -0.08}, {'column': 'Country', 'direction': 'stable', 'growth_rate': 0}], 'data_quality': {'missing_values': {'Invoice Date': 1, 'Country': 1}, 'outliers_detected': False, 'data_completeness': 0.98, 'recommendation': 'Data quality is high; proceed with confidence'}, 'insights': ['A significant drop in invoice amounts suggests potential operational issues or market challenges', 'Concentration of transactions in a few countries indicates regional focus and importance'], 'recommendations': ['Analyze the root causes behind the decline in Invoice Amounts, focusing on specific regions or products', 'Enhance sales efforts in underperforming geographic areas to balance revenue distribution'], 'filters': [{'column': 'Country', 'filter_type': 'dropdown', 'label': 'Country'}, {'column': 'Invoice Date', 'filter_type': 'range', 'label': 'Date Range'}], 'kpis': [{'metric': 'Invoice Amount', 'aggregation': 'sum', 'label': '$Total Invoice Amounts'}, {'metric': 'count', 'aggregation': 'count', 'label': 'Number of Invoices'}], 'charts': [{'chart_id': 'chart-0', 'type': 'line', 'x': 'Invoice Date', 'y': 'Invoice Amount', 'title': 'Trend in Invoice Amounts Over Time', 'size': 'full'}, {'chart_id': 'chart-1', 'type': 'bar', 'x': 'Country', 'y': 'Invoice Amount', 'title': 'Total Invoice Amount by Country', 'size': '1/2'}], 'layout_grid': '2-col', 'narrative': 'This dashboard highlights the trend in invoice amounts over time, identifies key countries driving revenue, and provides filters for deeper analysis.'}
+======================
+[OK] LLM analysis successful
+[INFO] LLM suggested: 2 filters, 2 KPIs, 2 charts
 
-            filters = []
-            if 'filters' in config_dict:
-                for f in config_dict.get('filters', []):
-                    print("FILTER RAW:", f)
-                    col = f.get('column', '')
-                    if not df is None and col not in valid_columns:
-                        print(f"[WARN] Filter column '{col}' not found in dataset, skipping")
-                        continue
-                    filters.append(FilterConfig(
-                        column=col,
-                        filter_type=f.get('filter_type', 'dropdown'),
-                        label=f.get('label', col)
-                    ))
+====CONFIG_DICT====
+{
+  "executive_summary": {
+    "key_findings": [
+      "Invoice Amount declined YoY in Q3, indicating a potential revenue drop",
+      "Data completeness is at 97.6%, with minimal missing data across columns",
+      "Most invoice transactions are concentrated among a few key countries"
+    ],
+    "data_quality_score": 0.92,
+    "overall_health": "Healthy",
+    "missing_data_pct": 1.5,
+    "reliability": "High"
+  },
+  "trends": [
+    {
+      "column": "Invoice Amount",
+      "direction": "decreasing",
+      "growth_rate": -0.08
+    },
+    {
+      "column": "Country",
+      "direction": "stable",
+      "growth_rate": 0
+    }
+  ],
+  "data_quality": {
+    "missing_values": {
+      "Invoice Date": 1,
+      "Country": 1
+    },
+    "outliers_detected": false,
+    "data_completeness": 0.98,
+    "recommendation": "Data quality is high; proceed with confidence"
+  },
+  "insights": [
+    "A significant drop in invoice amounts suggests potential operational issues or market challenges",
+    "Concentration of transactions in a few countries indicates regional focus and importance"
+  ],
+  "recommendations": [
+    "Analyze the root causes behind the decline in Invoice Amounts, focusing on specific regions or products",
+    "Enhance sales efforts in underperforming geographic areas to balance revenue distribution"
+  ],
+  "filters": [
+    {
+      "column": "Country",
+      "filter_type": "dropdown",
+      "label": "Country"
+    },
+    {
+      "column": "Invoice Date",
+      "filter_type": "range",
+      "label": "Date Range"
+    }
+  ],
+  "kpis": [
+    {
+      "metric": "Invoice Amount",
+      "aggregation": "sum",
+      "label": "$Total Invoice Amounts"
+    },
+    {
+      "metric": "count",
+      "aggregation": "count",
+      "label": "Number of Invoices"
+    }
+  ],
+  "charts": [
+    {
+      "chart_id": "chart-0",
+      "type": "line",
+      "x": "Invoice Date",
+      "y": "Invoice Amount",
+      "title": "Trend in Invoice Amounts Over Time",
+      "size": "full"
+    },
+    {
+      "chart_id": "chart-1",
+      "type": "bar",
+      "x": "Country",
+      "y": "Invoice Amount",
+      "title": "Total Invoice Amount by Country",
+      "size": "1/2"
+    }
+  ],
+  "layout_grid": "2-col",
+  "narrative": "This dashboard highlights the trend in invoice amounts over time, identifies key countries driving revenue, and provides filters for deeper analysis."
+}
+=======================
 
-            kpis = []
-            if 'kpis' in config_dict:
-                for k in config_dict.get('kpis', []):
-                    # Handle both string and dict formats
-                    if isinstance(k, str):
-                        metric = k
-                        if not df is None and metric not in valid_columns:
-                            print(f"[WARN] KPI metric '{metric}' not found in dataset, skipping")
-                            continue
-                        kpis.append(KPIConfig(
-                            metric=metric,
-                            aggregation='sum',
-                            label=metric.replace('_', ' ').title()
-                        ))
-                    else:
-                        print("KPI RAW:", k)
-                        metric = k.get('metric', '')
-                        if not df is None and metric not in valid_columns:
-                            print(f"[WARN] KPI metric '{metric}' not found in dataset, skipping")
-                            continue
-                        kpis.append(KPIConfig(
-                            metric=metric,
-                            aggregation=k.get('aggregation', 'sum'),
-                            label=k.get('label', metric.replace('_', ' ').title())
-                        ))
+FILTER RAW: {'column': 'Country', 'filter_type': 'dropdown', 'label': 'Country'}
+FILTER RAW: {'column': 'Invoice Date', 'filter_type': 'range', 'label': 'Date Range'}
+KPI RAW: {'metric': 'Invoice Amount', 'aggregation': 'sum', 'label': '$Total Invoice Amounts'}
+KPI RAW: {'metric': 'count', 'aggregation': 'count', 'label': 'Number of Invoices'}
+[WARN] KPI metric 'count' not found in dataset, skipping
+CHART RAW: {'chart_id': 'chart-0', 'type': 'line', 'x': 'Invoice Date', 'y': 'Invoice Amount', 'title': 'Trend in Invoice Amounts Over Time', 'size': 'full'}
+CHART RAW: {'chart_id': 'chart-1', 'type': 'bar', 'x': 'Country', 'y': 'Invoice Amount', 'title': 'Total Invoice Amount by Country', 'size': '1/2'}
 
-            charts = []
-            if 'charts' in config_dict:
-                for i, c in enumerate(config_dict.get('charts', [])):
-                    print("CHART RAW:", c)
-                    x_col = c.get('x', c.get('x_column', ''))
-                    y_col = c.get('y', c.get('y_column', ''))
+====FINAL CONFIG====
+Filters: 2
+KPIs: 1
+Charts: 2
+=======================
 
-                    # Validate columns exist
-                    if not df is None and (x_col not in valid_columns or y_col not in valid_columns):
-                        if x_col not in valid_columns:
-                            print(f"[WARN] Chart x_column '{x_col}' not found, skipping chart {i}")
-                        if y_col not in valid_columns:
-                            print(f"[WARN] Chart y_column '{y_col}' not found, skipping chart {i}")
-                        continue
+[OK] LLM analysis successful
+[OK] Chart analyzer initialized
 
-                    charts.append(ChartConfig(
-                        chart_id=c.get('chart_id', f'chart-{i}'),
-                        chart_type=c.get('type', c.get('chart_type', 'bar')),
-                        x_column=x_col,
-                        y_column=y_col,
-                        size=c.get('size', '1/3'),
-                        aggregation=c.get('aggregation', 'sum'),
-                        title=c.get('title')
-                    ))
+[INFO] Pre-initializing store data...
+[OK] Store data pre-initialized
+REGISTERING UPDATE_CHARTS CALLBACK
+ Signin clicked 0 None
+[OK] App DB connected: 192.168.202.114:5432
+ Signin clicked 1 veenash
+[AUTH] Login attempt: veenash
+[OK] Login success: veenash
+[AUTH] Login attempt: veenash
+[OK] Login success: veenash
+[OK] Upload saved: 20260619-130326-468394e3 (4,205 rows)
+SKIPPING INITIAL LOAD
+================================================================================
+AI CALLBACK FIRED
+N_CLICKS: 1
+TIME: 1781854491.7275207
+================================================================================
+STEP 1- CALLBACK STARTED
+DF_JSON IS NONE: False
+DF_JSON LENGTH: 1930659
+STEP 3- BEFORE READ_JSON
+DF_JSON TYPE: <class 'str'>
+DF_JSON PREVIEW: {"columns":["Client Name","Marsha","Property Name","Invoice No","Invoice Date","Due Days","Revenue Head","Nature of Services","Service","Invoice Amount","Below 30 Days","Overdue 30 - 60 Days","Overdue
+STEP 4- AFTER READ_JSON
+(4205, 31)
+STEP 5 - SUMMARY CREATED
+{'columns': ['Client Name', 'Marsha', 'Property Name', 'Invoice No', 'Invoice Date', 'Due Days', 'Revenue Head', 'Nature of Services', 'Service', 'Invoice Amount', 'Below 30 Days', 'Overdue 30 - 60 Days', 'Overdue 60 - 180 Days', 'Overdue Above 180 Days', 'Above 1 year', 'Balance Collection Amount', 'Credit Note Issued', 'Balance Amount', 'Unnamed: 18', 'Forex Balance Amount', 'Particulars', 'Manager', 'Partner', 'Department', 'Company Group', 'Group', 'Contact Person Name', 'Brand Name', 'Project MID', 'Country', 'GST NO'], 'row_count': 4205, 'numeric_columns': ['Invoice Date', 'Due Days', 'Invoice Amount', 'Below 30 Days', 'Overdue 30 - 60 Days', 'Overdue 60 - 180 Days', 'Overdue Above 180 Days', 'Above 1 year', 'Balance Collection Amount', 'Credit Note Issued', 'Balance Amount', 'Unnamed: 18', 'Forex Balance Amount'], 'categorical_columns': ['Client Name', 'Marsha', 'Property Name', 'Invoice No', 'Revenue Head', 'Nature of Services', 'Service', 'Particulars', 'Manager', 'Partner', 'Department', 'Company Group', 'Group', 'Contact Person Name', 'Brand Name', 'Project MID', 'Country', 'GST NO']}
+STEP 6 - BEFORE ANALYZE
+[INFO] Sending data to LLM for analysis...
 
-            if not charts:
-                print("[WARN] No valid charts generated after validation")
-            if not kpis:
-                print("[WARN] No valid KPIs generated after validation")
-            if not filters:
-                print("[WARN] No valid filters generated after validation")
+===PROMPT PREVIEW===
+You are a McKinsey-level data analytics consultant. Analyze this dataset comprehensively and generate a professional dashboard configuration with executive insights.
 
-            return DashboardConfig(
-                filters=filters,
-                kpis=kpis,
-                charts=charts,
-                layout_grid=config_dict.get('layout_grid', '2-col'),
-                reasoning=config_dict.get('narrative', config_dict.get('reasoning', 'LLM-generated'))
-            )
-        except Exception as e:
-            print(f"[ERROR] Failed to convert LLM response to config: {e}")
-            return None
+CONTEXT: No additional context provided
 
+COLUMN PROFILES:
+{
+  "Client Name": {
+    "dtype": "categorical",
+    "cardinality": 1202,
+    "missing_pct": 0.2,
+    "range": null,
+    "top_values": [
+      "GRASIM INDS LTD",
+      "DUET INDIA HOTELS (CHENNAI OMR) PVT. LTD.",
+      "GRASIM INDUSTRIES LIMITED",
+      "PALLAZZIO HOTELS & LEISURE LTD.",
+      "GRASIM INDUSTRIES LIMITED, STAPLE FIBRE DIVISION, NAGDA"
+    ],
+    "is_temporal": false,
+    "has_outliers": false
+  },
+  "Marsha": {
+    "dtype": "categorical",
+    "cardinality": 555,
+    "missing_pct": 57.6,
+    "range": null,
+    "top_values": [
+      "MAAFO",
+      "BOMXR",
+      "IDRSI",
+      "DEDFI",
+      "."
+    ],
+    "is_temporal": false,
+    "has_outliers": false
+  },
+  "Property Name": {
+    "dtype": "categorical",
+    "cardinality": 451,
+    "missing_pct": 77.3,
+    "range": null,
+    "top_values": [
+      "Four Points by Sheraton Chennai OMR",
+      "The St. Regis Mumbai",
+      "Fairfield By Marriott Dehradun",
+      "FAIRFIELD BY MARRIOTT JAIPUR TONK ROAD",
+      "COURTYARD BY MARRIOTT RANCHI"
+    ],
+    "is_temporal": false,
+    "has_outliers": false
+  },
+  "Invoice No": {
+    "dtype": "categorical",
+    "cardinality": 4198,
+    "missing_pct": 0.2,
+    "range": null,
+    "top_values": [
+      "OSO2526-27011449",
+      "OSO2526-27040019",
+      "OSO2526-27040020",
+      "OSO2526-27011602",
+      "OSO2526-27020476"
+    ],
+    "is_temporal": false,
+    "has_outliers": false
+  },
+  "Invoice Date": {
+    "dtype": "temporal",
+    "cardinality": 528,
+    "missing_pct": 0.2,
+    "range": null,
+    "top_values": [
+      "2026-02-05",
+      "2026-03-06",
+      "2026-03-09",
+      "2026-03-05",
+      "2026-02-04"
+    ],
+    "is_temporal": true,
+    "has_outliers": false
+  },
+  "Due Days": {
+    "dtype": "numeric",
+    "cardinality": 528,
+    "missing_pct": 0.2,
+    "range": null,
+    "top_values": [
+      "39.0",
+      "10.0",
+      "7.0",
+      "11.0",
+      "40.0"
+    ],
+    "is_temporal": false,
+    "has_outliers": false
+  },
+  "Revenue Head": {
+    "dtype": "categorical",
+    "cardinality": 26,
+    "missing_pct": 8.3,
+    "range": null,
+    "top_values": [
+      "Payroll Management",
+      "SAM",
+      "DMS",
+      "HRMS",
+      "Recon Tool"
+    ],
+    "is_temporal": false,
+    "has_outliers": false
+  },
+  "Nature of Services": {
+    "dtype": "categorical",
+    "cardinality": 6,
+    "missing_pct": 8.3,
+    "range": null,
+    "top_values": [
+      "Local",
+      "Export",
+      "Exempt",
+      "ON ACCOUNT",
+      "LOCAL"
+    ],
+    "is_temporal": false,
+    "has_outliers": false
+  },
+  "Service": {
+    "dtype": "categorical",
+    "cardinality": 48,
+    "missing_pct": 0.2,
+    "range": null,
+    "top_values": [
+      "PAYROLL",
+      "GREEN SAM",
+      "HRMS",
+      "ON ACCOUNT",
+      "PROJECT TREE"
+    ],
+    "is_temporal"
+===END PROMPT===
+
+[INFO] Calling Ollama at https://ollama.osourceglobal.com:11434...
+[INFO] Using model: qwen2.5:14b
+[INFO] Testing connectivity (10s timeout)...
+[OK] Ollama server is responding
+[INFO] Sending analysis request (timeout: 300s)...
+[DEBUG] Response status: 200
+
+===OLLAMA RESPONSE===
+{
+  "executive_summary": {
+    "key_findings": [
+      "Total Invoice Amount has increased by 15% compared to the previous year.",
+      "The dataset is missing less than 3% of data, with a completeness rate of 97%",
+      "Top regions contributing more than half of the total invoice amount are North America and Europe"
+    ],
+    "data_quality_score": 0.97,
+    "overall_health": "Healthy",
+    "missing_data_pct": 2.8,
+    "reliability": "High"
+  },
+  "trends": [
+    {"column": "Invoice Amount", "direction": "increasing", "growth_rate": 0.15},
+    {"column": "Invoice Date", "direction": "stable", "growth_rate": 0}
+  ],
+  "data_quality": {
+    "missing_values": {"Invoice Amount": 2.8, "Invoice Date": 0},
+    "outliers_detected": false,
+    "data_completeness": 0.97,
+    "recommendation": "Data quality is high; proceed with confidence"
+  },
+  "insights": [
+    "North America and Europe contribute more than half of the total invoice amount",
+    "The invoice amount has shown a steady increase over time, indicating growing business health"
+  ],
+  "recommendations": [
+    "Focus on North American and European markets to maximize revenue growth",
+    "Investigate recent trends in Invoice Amount for deeper insights into financial performance"
+  ],
+  "filters": [
+    {"column": "Region", "filter_type": "dropdown", "label": "Region"},
+    {"column": "Country", "filter_type": "dropdown", "label": "Country"}
+  ],
+  "kpis": [
+    {"metric": "Invoice Amount", "aggregation": "sum", "label": "$Total Invoice Revenue"},
+    {"metric": "count", "aggregation": "count", "label": "Number of Invoices"}
+  ],
+  "charts": [
+    {
+      "chart_id": "chart-0",
+      "type": "line",
+      "x": "Invoice Date",
+      "y": "Invoice Amount",
+      "title": "Trend in Total Invoice Revenue Over Time",
+      "size": "full"
+    },
+    {
+      "chart_id": "chart-1",
+      "type": "bar",
+      "x": "Region",
+      "y": "Invoice Amount",
+      "title": "Top Regions by Invoice Revenue",
+      "size": "1/2"
+    },
+    {
+      "chart_id": "chart-2",
+      "type": "pie",
+      "x": "Country",
+      "y": "Invoice Amount",
+      "title": "Contribution of Countries to Total Invoice Revenue",
+      "size": "1/3"
+    }
+  ],
+  "layout_grid": "3-col",
+  "narrative": "This dashboard provides a comprehensive overview of invoice revenue trends, focusing on key regions and countries. It highlights the steady increase in total invoice amount over time and identifies top contributors to revenue, enabling informed decision-making."
+}
+=====================
+
+[OK] Ollama response received
+
+====RAW LLM RESPONSE====
+{
+  "executive_summary": {
+    "key_findings": [
+      "Total Invoice Amount has increased by 15% compared to the previous year.",
+      "The dataset is missing less than 3% of data, with a completeness rate of 97%",
+      "Top regions contributing more than half of the total invoice amount are North America and Europe"
+    ],
+    "data_quality_score": 0.97,
+    "overall_health": "Healthy",
+    "missing_data_pct": 2.8,
+    "reliability": "High"
+  },
+  "trends": [
+    {"column": "Invoice Amount", "direction": "increasing", "growth_rate": 0.15},
+    {"column": "Invoice Date", "direction": "stable", "growth_rate": 0}
+  ],
+  "data_quality": {
+    "missing_values": {"Invoice Amount": 2.8, "Invoice Date": 0},
+    "outliers_detected": false,
+    "data_completeness": 0.97,
+    "recommendation": "Data quality is high; proceed with confidence"
+  },
+  "insights": [
+    "North America and Europe contribute more than half of the total invoice amount",
+    "The invoice amount has shown a steady increase over time, indicating growing business health"
+  ],
+  "recommendations": [
+    "Focus on North American and European markets to maximize revenue growth",
+    "Investigate recent trends in Invoice Amount for deeper insights into financial performance"
+  ],
+  "filters": [
+    {"column": "Region", "filter_type": "dropdown", "label": "Region"},
+    {"column": "Country", "filter_type": "dropdown", "label": "Country"}
+  ],
+  "kpis": [
+    {"metric": "Invoice Amount", "aggregation": "sum", "label": "$Total Invoice Revenue"},
+    {"metric": "count", "aggregation": "count", "label": "Number of Invoices"}
+  ],
+  "charts": [
+    {
+      "chart_id": "chart-0",
+      "type": "line",
+      "x": "Invoice Date",
+      "y": "Invoice Amount",
+      "title": "Trend in Total Invoice Revenue Over Time",
+      "size": "full"
+    },
+    {
+      "chart_id": "chart-1",
+      "type": "bar",
+      "x": "Region",
+      "y": "Invoice Amount",
+      "title": "Top Regions by Invoice Revenue",
+      "size": "1/2"
+    },
+    {
+      "chart_id": "chart-2",
+      "type": "pie",
+      "x": "Country",
+      "y": "Invoice Amount",
+      "title": "Contribution of Countries to Total Invoice Revenue",
+      "size": "1/3"
+    }
+  ],
+  "layout_grid": "3-col",
+  "narrative": "This dashboard provides a comprehensive overview of invoice revenue trends, focusing on key regions and countries. It highlights the steady increase in total invoice amount over time and identifies top contributors to revenue, enabling informed decision-making."
+}
+===========================
+
+====CHARTS FROM LLM====
+[{'chart_id': 'chart-0', 'type': 'line', 'x': 'Invoice Date', 'y': 'Invoice Amount', 'title': 'Trend in Total Invoice Revenue Over Time', 'size': 'full'}, {'chart_id': 'chart-1', 'type': 'bar', 'x': 'Region', 'y': 'Invoice Amount', 'title': 'Top Regions by Invoice Revenue', 'size': '1/2'}, {'chart_id': 'chart-2', 'type': 'pie', 'x': 'Country', 'y': 'Invoice Amount', 'title': 'Contribution of Countries to Total Invoice Revenue', 'size': '1/3'}]
+====================
+
+
+====CONFIG_DICT====
+{'executive_summary': {'key_findings': ['Total Invoice Amount has increased by 15% compared to the previous year.', 'The dataset is missing less than 3% of data, with a completeness rate of 97%', 'Top regions contributing more than half of the total invoice amount are North America and Europe'], 'data_quality_score': 0.97, 'overall_health': 'Healthy', 'missing_data_pct': 2.8, 'reliability': 'High'}, 'trends': [{'column': 'Invoice Amount', 'direction': 'increasing', 'growth_rate': 0.15}, {'column': 'Invoice Date', 'direction': 'stable', 'growth_rate': 0}], 'data_quality': {'missing_values': {'Invoice Amount': 2.8, 'Invoice Date': 0}, 'outliers_detected': False, 'data_completeness': 0.97, 'recommendation': 'Data quality is high; proceed with confidence'}, 'insights': ['North America and Europe contribute more than half of the total invoice amount', 'The invoice amount has shown a steady increase over time, indicating growing business health'], 'recommendations': ['Focus on North American and European markets to maximize revenue growth', 'Investigate recent trends in Invoice Amount for deeper insights into financial performance'], 'filters': [{'column': 'Region', 'filter_type': 'dropdown', 'label': 'Region'}, {'column': 'Country', 'filter_type': 'dropdown', 'label': 'Country'}], 'kpis': [{'metric': 'Invoice Amount', 'aggregation': 'sum', 'label': '$Total Invoice Revenue'}, {'metric': 'count', 'aggregation': 'count', 'label': 'Number of Invoices'}], 'charts': [{'chart_id': 'chart-0', 'type': 'line', 'x': 'Invoice Date', 'y': 'Invoice Amount', 'title': 'Trend in Total Invoice Revenue Over Time', 'size': 'full'}, {'chart_id': 'chart-1', 'type': 'bar', 'x': 'Region', 'y': 'Invoice Amount', 'title': 'Top Regions by Invoice Revenue', 'size': '1/2'}, {'chart_id': 'chart-2', 'type': 'pie', 'x': 'Country', 'y': 'Invoice Amount', 'title': 'Contribution of Countries to Total Invoice Revenue', 'size': '1/3'}], 'layout_grid': '3-col', 'narrative': 'This dashboard provides a comprehensive overview of invoice revenue trends, focusing on key regions and countries. It highlights the steady increase in total invoice amount over time and identifies top contributors to revenue, enabling informed decision-making.'}
+======================
+[OK] LLM analysis successful
+[INFO] LLM suggested: 2 filters, 2 KPIs, 3 charts
+
+====CONFIG_DICT====
+{
+  "executive_summary": {
+    "key_findings": [
+      "Total Invoice Amount has increased by 15% compared to the previous year.",
+      "The dataset is missing less than 3% of data, with a completeness rate of 97%",
+      "Top regions contributing more than half of the total invoice amount are North America and Europe"
+    ],
+    "data_quality_score": 0.97,
+    "overall_health": "Healthy",
+    "missing_data_pct": 2.8,
+    "reliability": "High"
+  },
+  "trends": [
+    {
+      "column": "Invoice Amount",
+      "direction": "increasing",
+      "growth_rate": 0.15
+    },
+    {
+      "column": "Invoice Date",
+      "direction": "stable",
+      "growth_rate": 0
+    }
+  ],
+  "data_quality": {
+    "missing_values": {
+      "Invoice Amount": 2.8,
+      "Invoice Date": 0
+    },
+    "outliers_detected": false,
+    "data_completeness": 0.97,
+    "recommendation": "Data quality is high; proceed with confidence"
+  },
+  "insights": [
+    "North America and Europe contribute more than half of the total invoice amount",
+    "The invoice amount has shown a steady increase over time, indicating growing business health"
+  ],
+  "recommendations": [
+    "Focus on North American and European markets to maximize revenue growth",
+    "Investigate recent trends in Invoice Amount for deeper insights into financial performance"
+  ],
+  "filters": [
+    {
+      "column": "Region",
+      "filter_type": "dropdown",
+      "label": "Region"
+    },
+    {
+      "column": "Country",
+      "filter_type": "dropdown",
+      "label": "Country"
+    }
+  ],
+  "kpis": [
+    {
+      "metric": "Invoice Amount",
+      "aggregation": "sum",
+      "label": "$Total Invoice Revenue"
+    },
+    {
+      "metric": "count",
+      "aggregation": "count",
+      "label": "Number of Invoices"
+    }
+  ],
+  "charts": [
+    {
+      "chart_id": "chart-0",
+      "type": "line",
+      "x": "Invoice Date",
+      "y": "Invoice Amount",
+      "title": "Trend in Total Invoice Revenue Over Time",
+      "size": "full"
+    },
+    {
+      "chart_id": "chart-1",
+      "type": "bar",
+      "x": "Region",
+      "y": "Invoice Amount",
+      "title": "Top Regions by Invoice Revenue",
+      "size": "1/2"
+    },
+    {
+      "chart_id": "chart-2",
+      "type": "pie",
+      "x": "Country",
+      "y": "Invoice Amount",
+      "title": "Contribution of Countries to Total Invoice Revenue",
+      "size": "1/3"
+    }
+  ],
+  "layout_grid": "3-col",
+  "narrative": "This dashboard provides a comprehensive overview of invoice revenue trends, focusing on key regions and countries. It highlights the steady increase in total invoice amount over time and identifies top contributors to revenue, enabling informed decision-making."
+}
+=======================
+
+FILTER RAW: {'column': 'Region', 'filter_type': 'dropdown', 'label': 'Region'}
+[WARN] Filter column 'Region' not found in dataset, skipping
+FILTER RAW: {'column': 'Country', 'filter_type': 'dropdown', 'label': 'Country'}
+KPI RAW: {'metric': 'Invoice Amount', 'aggregation': 'sum', 'label': '$Total Invoice Revenue'}
+KPI RAW: {'metric': 'count', 'aggregation': 'count', 'label': 'Number of Invoices'}
+[WARN] KPI metric 'count' not found in dataset, skipping
+CHART RAW: {'chart_id': 'chart-0', 'type': 'line', 'x': 'Invoice Date', 'y': 'Invoice Amount', 'title': 'Trend in Total Invoice Revenue Over Time', 'size': 'full'}
+CHART RAW: {'chart_id': 'chart-1', 'type': 'bar', 'x': 'Region', 'y': 'Invoice Amount', 'title': 'Top Regions by Invoice Revenue', 'size': '1/2'}
+[WARN] Chart x_column 'Region' not found, skipping chart 1
+CHART RAW: {'chart_id': 'chart-2', 'type': 'pie', 'x': 'Country', 'y': 'Invoice Amount', 'title': 'Contribution of Countries to Total Invoice Revenue', 'size': '1/3'}
+
+====FINAL CONFIG====
+Filters: 1
+KPIs: 1
+Charts: 2
+=======================
+
+STEP 7 - AFTER ANALYZE
+<class 'core.config.DashboardConfig'>
+DashboardConfig(filters=[FilterConfig(column='Country', filter_type='dropdown', label='Country', default_value=None)], kpis=[KPIConfig(metric='Invoice Amount', aggregation='sum', label='$Total Invoice Revenue', color='#1A365D', bg_color='#EFF6FF')], charts=[ChartConfig(chart_id='chart-0', chart_type='line', x_column='Invoice Date', y_column='Invoice Amount', groupby_column=None, size='full', aggregation='sum', title='Trend in Total Invoice Revenue Over Time'), ChartConfig(chart_id='chart-2', chart_type='pie', x_column='Country', y_column='Invoice Amount', groupby_column=None, size='1/3', aggregation='sum', title='Contribution of Countries to Total Invoice Revenue')], layout_grid='3-col', reasoning='This dashboard provides a comprehensive overview of invoice revenue trends, focusing on key regions and countries. It highlights the steady increase in total invoice amount over time and identifies top contributors to revenue, enabling informed decision-making.')
+RESULT DIR
+['__annotations__', '__class__', '__dataclass_fields__', '__dataclass_params__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__match_args__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', 'charts', 'filters', 'kpis', 'layout_grid', 'reasoning', 'to_dict']
+TO DICT
+{'filters': [{'column': 'Country', 'filter_type': 'dropdown', 'label': 'Country'}], 'kpis': [{'metric': 'Invoice Amount', 'aggregation': 'sum', 'label': '$Total Invoice Revenue'}], 'charts': [{'chart_id': 'chart-0', 'chart_type': 'line', 'x': 'Invoice Date', 'y': 'Invoice Amount', 'groupby': None, 'aggregation': 'sum', 'size': 'full'}, {'chart_id': 'chart-2', 'chart_type': 'pie', 'x': 'Country', 'y': 'Invoice Amount', 'groupby': None, 'aggregation': 'sum', 'size': '1/3'}], 'layout_grid': '3-col', 'reasoning': 'This dashboard provides a comprehensive overview of invoice revenue trends, focusing on key regions and countries. It highlights the steady increase in total invoice amount over time and identifies top contributors to revenue, enabling informed decision-making.'}
+RETURNING TO STORE:
+<class 'str'>
+This dashboard provides a comprehensive overview of invoice revenue trends, focusing on key regions and countries. It highlights the steady increase in total invoice amount over time and identifies top contributors to revenue, enabling informed decision-making.
+RETURN TYPE: <class 'dict'>
+STORE DATA {'filters': [{'column': 'Country', 'filter_type': 'dropdown', 'label': 'Country'}], 'kpis': [{'metric': 'Invoice Amount', 'aggregation': 'sum', 'label': '$Total Invoice Revenue'}], 'charts': [{'chart_id': 'chart-0', 'chart_type': 'line', 'x': 'Invoice Date', 'y': 'Invoice Amount', 'groupby': None, 'aggregation': 'sum', 'size': 'full'}, {'chart_id': 'chart-2', 'chart_type': 'pie', 'x': 'Country', 'y': 'Invoice Amount', 'groupby': None, 'aggregation': 'sum', 'size': '1/3'}], 'layout_grid': '3-col', 'reasoning': 'This dashboard provides a comprehensive overview of invoice revenue trends, focusing on key regions and countries. It highlights the steady increase in total invoice amount over time and identifies top contributors to revenue, enabling informed decision-making.'}
