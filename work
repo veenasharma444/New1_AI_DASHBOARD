@@ -1,91 +1,114 @@
-print("PAGE_CONFIG LOADED")
-@callback(
-    Output('ai-analysis-results', 'children'),
-    Output('store-ai-suggestions', 'data'),
-    Input('btn-analyze-ai', 'n_clicks'),
-    State('store-global-dataframe', 'data'),
+@app.callback(
+    Output('page-content', 'children'),
+    Input('url', 'pathname'),
+    [State('store-global-dataframe', 'data'),
     State('store-global-profiles', 'data'),
     State('store-objective', 'data'),
-    prevent_initial_call=True
+    State('store-initial-config', 'data'),
+    State('session-state', 'data'),
+    State('store-kpi-selections', 'data'),
+    State('store-filter-selections', 'data')],
+    prevent_initial_call=False
 )
+def display_page(pathname, df_json, profiles_dict,  objective_data, config_dict, session_data, store_kpi_data, store_filter_data):
+    """Route to appropriate page based on URL and authentication"""
+    if not pathname or pathname == '':
+        pathname = '/'
 
-def run_ai_analysis(n_clicks, df_json, profiles, objective):
-    if not n_clicks:
-        print("SKIPPING INITIAL LOAD")
-        raise PreventUpdate
+    pathname = str(pathname).strip()
     
-    import time
-    print("=" * 80)
-    print("AI CALLBACK FIRED")
-    print("N_CLICKS:", n_clicks)
-    print("TIME:", time.time())
-    print("=" *80)
-    
-    print("STEP 1- CALLBACK STARTED")
-    if not df_json:
-        print("STEP 2- NO DF JSON")
-        return dbc.Alert("No data available", color="warning"), None
-    print("DF_JSON IS NONE:", df_json is None)
-    print("DF_JSON LENGTH:", len(df_json) if df_json else 0)
-    print("STEP 3- BEFORE READ_JSON")   
+    session_data = session_data or {}
+    is_authenticated = session_data.get("is_authenticated", False)
+
+    #  Block all pages except /auth if not authenticated
+    if pathname != '/auth' and not is_authenticated:
+        return page_auth.generate_auth_page()
+
+    #  Redirect authenticated users away from /auth page
+    if pathname == '/auth' and is_authenticated:
+        return page_upload.generate_upload_page()
+   
     try:
-        print("DF_JSON TYPE:", type(df_json))
-        print("DF_JSON PREVIEW:", str(df_json)[:200])  # Print the first 200 chars to avoid overload
+        # Show auth page
+        if pathname == '/auth' or pathname == '/login' or pathname == '/':
+            return page_auth.generate_auth_page()
+
+        # Check data for other routes
+        if not df_json or not profiles_dict:
+            return html.Div(
+                [
+                    html.H3("Error: Data not initialized"),
+                    html.P("Please refresh the page."),
+                ],
+                style={'padding': '20px', 'textAlign': 'center', 'color': 'red'}
+            )
+
+        current_df = get_cached_dataframe()
+        if current_df is None:
+            return html.Div(
+                [html.H3("Error: Data not loaded"), html.P("Check server logs.")],
+                style={'padding': '20px', 'color': 'red'}
+            )
+
+        current_profiles = load_cached_profiles()
+        if not current_profiles:
+            return html.Div(
+                [html.H3("Error: Profiles not available"), html.P("Check server logs.")],
+                style={'padding': '20px', 'color': 'red'}
+            )
+
+        confirmed_dtypes = session_data.get('confirmed_dtypes', {})
+        if not confirmed_dtypes:
+            confirmed_dtypes = {}
+            for col, profile_data in current_profiles.items():
+                confirmed_dtypes[col] = profile_data.get('dtype', 'categorical')
+
+        # Route to pages
+        if pathname == '/upload':
+            return page_upload.generate_upload_page()
+
+        elif pathname == '/config':
+            return page_config.generate_config_page(current_df, current_profiles, confirmed_dtypes)
+
+        elif pathname == '/dashboard':
+            kpi_selections = session_data.get('kpi_selections', store_kpi_data or [])
+            filter_selections = session_data.get('filter_selections', store_filter_data or [])
+            
+
+            llm_analysis = None
+            if config_dict:
+                llm_analysis = AnalysisFormatter.format_analysis(
+                    type('DashboardConfig', (), config_dict)() if isinstance(config_dict, dict) else config_dict
+                )
+
+            result = page_dashboard.generate_dashboard_page(
+                current_df,
+                kpi_selections=kpi_selections,
+                filter_selections=filter_selections,
+                confirmed_dtypes=confirmed_dtypes,
+                llm_analysis=llm_analysis
+            )
+            return result
         
-        # df = pd.read_json(df_json, orient='split')
-        from io import StringIO
-        df = pd.read_json(StringIO(df_json), orient='split')
-        print("STEP 4- AFTER READ_JSON")
-        print(df.shape)
-        # ✅ LIMIT DATA (CRITICAL)
-        df_sample = df.head(50)
-        summary = {
-            "columns": list(df.columns),
-            "row_count": len(df),
-            "numeric_columns": df.select_dtypes(include='number').columns.tolist(),
-            "categorical_columns": df.select_dtypes(include='object').columns.tolist()
-        }
-        print("STEP 5 - SUMMARY CREATED")
-        print(summary)
+        elif pathname == '/data-review':
+            return page_data_review.generate_data_review_page(current_df, current_profiles)
         
-        if llm_analyzer:
-            print("STEP 6 - BEFORE ANALYZE")
-            result = llm_analyzer.analyze(df_sample, profiles, objective or "")
-            print("STEP 7 - AFTER ANALYZE")
-            print(type(result))
-            print(result)
-            
-            print("RESULT DIR")
-            print(dir(result))
-            
-            print("TO DICT")
-            print(result.to_dict())
-            
-            print("RETURNING TO STORE:")
-            print(type(result.reasoning if result else " "))
-            print(result.reasoning if result else " ")
-            
-            print("RETURN TYPE:", type(result.to_dict()))
-            print("STORE DATA", result.to_dict())
-            
-            return( html.Div([
-                    html.H5("AI Suggestions"),
-                    html.Div(result.reasoning if result else "No suggestions generated", 
-                        style={
-                        'whiteSpace': 'pre-wrap',
-                        'background': '#F7FAFC',
-                        'padding': '10px',
-                        'borderRadius': '6px'
-                    })
-                ]), 
-                    result.to_dict() if result else {}
-            )           
+        elif pathname == '/companies':
+            from pages import page_companies
+            return page_companies.generate_companies_page()
+        
+        elif pathname == '/mapping':
+            from pages import page_user_company
+            return page_user_company.generate_mapping_page()
+
         else:
-            print("STEP X - LLM IS NONE")
-            return dbc.Alert("LLM not initialized", color="danger"), None
-        
+            return page_auth.generate_auth_page()
+
     except Exception as e:
-        print("READ_JSON ERROR")
-        print(type(e).__name__)
-        print(str(e))
-        return dbc.Alert(f"AI Error: {type(e).__name__}: {str(e)}", color="danger"), None
+        import traceback
+        print(f"[ERROR] display_page: {type(e).__name__}: {e}\n{traceback.format_exc()}")
+        return html.Div(
+            [html.H3("Error loading page"), html.P("Check server logs.")],
+            style={'padding': '20px', 'backgroundColor': '#ffeeee', 'color': '#cc0000'}
+        )
+
