@@ -1,641 +1,79 @@
-[OK] Store data pre-initialized
-REGISTERING UPDATE_CHARTS CALLBACK
-SKIPPING INITIAL LOAD
-================================================================================
-AI CALLBACK FIRED
-N_CLICKS: 1
-TIME: 1781861269.159452
-================================================================================
-STEP 1- CALLBACK STARTED
-DF_JSON IS NONE: False
-DF_JSON LENGTH: 1930659
-STEP 3- BEFORE READ_JSON
-DF_JSON TYPE: <class 'str'>
-DF_JSON PREVIEW: {"columns":["Client Name","Marsha","Property Name","Invoice No","Invoice Date","Due Days","Revenue Head","Nature of Services","Service","Invoice Amount","Below 30 Days","Overdue 30 - 60 Days","Overdue
-STEP 4- AFTER READ_JSON
-(4205, 31)
-STEP 5 - SUMMARY CREATED
-{'columns': ['Client Name', 'Marsha', 'Property Name', 'Invoice No', 'Invoice Date', 'Due Days', 'Revenue Head', 'Nature of Services', 'Service', 'Invoice Amount', 'Below 30 Days', 'Overdue 30 - 60 Days', 'Overdue 60 - 180 Days', 'Overdue Above 180 Days', 'Above 1 year', 'Balance Collection Amount', 'Credit Note Issued', 'Balance Amount', 'Unnamed: 18', 'Forex Balance Amount', 'Particulars', 'Manager', 'Partner', 'Department', 'Company Group', 'Group', 'Contact Person Name', 'Brand Name', 'Project MID', 'Country', 'GST NO'], 'row_count': 4205, 'numeric_columns': ['Invoice Date', 'Due Days', 'Invoice Amount', 'Below 30 Days', 'Overdue 30 - 60 Days', 'Overdue 60 - 180 Days', 'Overdue Above 180 Days', 'Above 1 year', 'Balance Collection Amount', 'Credit Note Issued', 'Balance Amount', 'Unnamed: 18', 'Forex Balance Amount'], 'categorical_columns': ['Client Name', 'Marsha', 'Property Name', 'Invoice No', 'Revenue Head', 'Nature of Services', 'Service', 'Particulars', 'Manager', 'Partner', 'Department', 'Company Group', 'Group', 'Contact Person Name', 'Brand Name', 'Project MID', 'Country', 'GST NO']}
-STEP 6 - BEFORE ANALYZE
-[INFO] Sending data to LLM for analysis...
+app.layout = html.Div([
+    dcc.Location(id='url', refresh=False),
 
-===PROMPT PREVIEW===
-You are a McKinsey-level data analytics consultant. Analyze this dataset comprehensively and generate a professional dashboard configuration with executive insights.
+    # Navbar - rendered conditionally based on authentication
+    html.Div(id='navbar-container'),
 
-CONTEXT: No additional context provided
+    # Session state - stored in browser localStorage
+    dcc.Store(id='session-state', storage_type='local', data={}),
+    dcc.Store(id='store-global-dataframe', storage_type='memory', data=df_json),
+    dcc.Store(id='store-global-profiles', storage_type='memory', data=profiles_dict),
+    dcc.Store(id='store-initial-config', storage_type='memory', data=config_dict),
 
-COLUMN PROFILES:
-{
-  "Client Name": {
-    "dtype": "categorical",
-    "cardinality": 1202,
-    "missing_pct": 0.2,
-    "range": null,
-    "top_values": [
-      "GRASIM INDS LTD",
-      "DUET INDIA HOTELS (CHENNAI OMR) PVT. LTD.",
-      "GRASIM INDUSTRIES LIMITED",
-      "PALLAZZIO HOTELS & LEISURE LTD.",
-      "GRASIM INDUSTRIES LIMITED, STAPLE FIBRE DIVISION, NAGDA"
-    ],
-    "is_temporal": false,
-    "has_outliers": false
-  },
-  "Marsha": {
-    "dtype": "categorical",
-    "cardinality": 555,
-    "missing_pct": 57.6,
-    "range": null,
-    "top_values": [
-      "MAAFO",
-      "BOMXR",
-      "IDRSI",
-      "DEDFI",
-      "."
-    ],
-    "is_temporal": false,
-    "has_outliers": false
-  },
-  "Property Name": {
-    "dtype": "categorical",
-    "cardinality": 451,
-    "missing_pct": 77.3,
-    "range": null,
-    "top_values": [
-      "Four Points by Sheraton Chennai OMR",
-      "The St. Regis Mumbai",
-      "Fairfield By Marriott Dehradun",
-      "FAIRFIELD BY MARRIOTT JAIPUR TONK ROAD",
-      "COURTYARD BY MARRIOTT RANCHI"
-    ],
-    "is_temporal": false,
-    "has_outliers": false
-  },
-  "Invoice No": {
-    "dtype": "categorical",
-    "cardinality": 4198,
-    "missing_pct": 0.2,
-    "range": null,
-    "top_values": [
-      "OSO2526-27011449",
-      "OSO2526-27040019",
-      "OSO2526-27040020",
-      "OSO2526-27011602",
-      "OSO2526-27020476"
-    ],
-    "is_temporal": false,
-    "has_outliers": false
-  },
-  "Invoice Date": {
-    "dtype": "temporal",
-    "cardinality": 528,
-    "missing_pct": 0.2,
-    "range": null,
-    "top_values": [
-      "2026-02-05",
-      "2026-03-06",
-      "2026-03-09",
-      "2026-03-05",
-      "2026-02-04"
-    ],
-    "is_temporal": true,
-    "has_outliers": false
-  },
-  "Due Days": {
-    "dtype": "numeric",
-    "cardinality": 528,
-    "missing_pct": 0.2,
-    "range": null,
-    "top_values": [
-      "39.0",
-      "10.0",
-      "7.0",
-      "11.0",
-      "40.0"
-    ],
-    "is_temporal": false,
-    "has_outliers": false
-  },
-  "Revenue Head": {
-    "dtype": "categorical",
-    "cardinality": 26,
-    "missing_pct": 8.3,
-    "range": null,
-    "top_values": [
-      "Payroll Management",
-      "SAM",
-      "DMS",
-      "HRMS",
-      "Recon Tool"
-    ],
-    "is_temporal": false,
-    "has_outliers": false
-  },
-  "Nature of Services": {
-    "dtype": "categorical",
-    "cardinality": 6,
-    "missing_pct": 8.3,
-    "range": null,
-    "top_values": [
-      "Local",
-      "Export",
-      "Exempt",
-      "ON ACCOUNT",
-      "LOCAL"
-    ],
-    "is_temporal": false,
-    "has_outliers": false
-  },
-  "Service": {
-    "dtype": "categorical",
-    "cardinality": 48,
-    "missing_pct": 0.2,
-    "range": null,
-    "top_values": [
-      "PAYROLL",
-      "GREEN SAM",
-      "HRMS",
-      "ON ACCOUNT",
-      "PROJECT TREE"
-    ],
-    "is_temporal"
-===END PROMPT===
+    dcc.Store(id='store-kpi-selections', storage_type='memory', data=[]),
+    dcc.Store(id='store-filter-selections', storage_type='memory', data=[]),
 
-[INFO] Calling Ollama at https://ollama.osourceglobal.com:11434...
-[INFO] Using model: qwen2.5:14b
-[INFO] Testing connectivity (10s timeout)...
-[OK] Ollama server is responding
-[INFO] Sending analysis request (timeout: 300s)...
-[DEBUG] Response status: 200
+    dcc.Store(id='store-ai-suggestions', storage_type='memory', data=None),
+    dcc.Store(id='store-objective', storage_type='memory', data=''),
+    dcc.Store(id='store-executive-summary', storage_type='memory', data=None),
 
-===OLLAMA RESPONSE===
-{
-  "executive_summary": {
-    "key_findings": [
-      "Invoice Amount has increased by 15% YoY, indicating robust revenue growth.",
-      "Missing data in Invoice Date column affects temporal analysis with 2.1% missing entries.",
-      "The dataset shows a healthy overall health score of 92%, suggesting reliable insights."
-    ],
-    "data_quality_score": 0.92,
-    "overall_health": "Healthy",
-    "missing_data_pct": 2.1,
-    "reliability": "High"
-  },
-  "trends": [
-    {
-      "column": "Invoice Amount",
-      "direction": "increasing",
-      "growth_rate": 0.15
-    }
-  ],
-  "data_quality": {
-    "missing_values": {"Invoice Date": 2.1},
-    "outliers_detected": false,
-    "data_completeness": 0.98,
-    "recommendation": "Data quality is high; proceed with confidence"
-  },
-  "insights": [
-    "A significant rise in Invoice Amount suggests successful revenue generation strategies.",
-    "Executive teams should focus on analyzing regional performance through filters."
-  ],
-  "recommendations": [
-    "Enhance temporal analysis by addressing missing data in the Invoice Date column.",
-    "Investigate regions showing high variance in Invoice Amount for targeted interventions."
-  ],
-  "filters": [
-    {"column": "Country", "filter_type": "dropdown", "label": "Country"},
-    {"column": "Customer Segment", "filter_type": "dropdown", "label": "Segment"}
-  ],
-  "kpis": [
-    {
-      "metric": "Invoice Amount",
-      "aggregation": "sum",
-      "label": "$Total Revenue"
-    }
-  ],
-  "charts": [
-    {
-      "chart_id": "chart-0",
-      "type": "line",
-      "x": "Invoice Date",
-      "y": "Invoice Amount",
-      "title": "Revenue Growth Over Time",
-      "size": "full"
-    },
-    {
-      "chart_id": "chart-1",
-      "type": "bar",
-      "x": "Country",
-      "y": "Invoice Amount",
-      "title": "Top Revenue Sources by Country",
-      "size": "1/2"
-    }
-  ],
-  "layout_grid": "3-col",
-  "narrative": "This dashboard reveals the robust revenue growth in Invoice Amount and enables deep-dive analysis into regional performance, providing actionable insights for strategic decision-making."
-}
-=====================
+    dcc.Store(id='store-confirmed-dtypes', storage_type='memory', data={}),
 
-[OK] Ollama response received
+    dcc.Store(id='db-conditions-store', storage_type='memory', data=[]),
 
-====RAW LLM RESPONSE====
-{
-  "executive_summary": {
-    "key_findings": [
-      "Invoice Amount has increased by 15% YoY, indicating robust revenue growth.",
-      "Missing data in Invoice Date column affects temporal analysis with 2.1% missing entries.",
-      "The dataset shows a healthy overall health score of 92%, suggesting reliable insights."
-    ],
-    "data_quality_score": 0.92,
-    "overall_health": "Healthy",
-    "missing_data_pct": 2.1,
-    "reliability": "High"
-  },
-  "trends": [
-    {
-      "column": "Invoice Amount",
-      "direction": "increasing",
-      "growth_rate": 0.15
-    }
-  ],
-  "data_quality": {
-    "missing_values": {"Invoice Date": 2.1},
-    "outliers_detected": false,
-    "data_completeness": 0.98,
-    "recommendation": "Data quality is high; proceed with confidence"
-  },
-  "insights": [
-    "A significant rise in Invoice Amount suggests successful revenue generation strategies.",
-    "Executive teams should focus on analyzing regional performance through filters."
-  ],
-  "recommendations": [
-    "Enhance temporal analysis by addressing missing data in the Invoice Date column.",
-    "Investigate regions showing high variance in Invoice Amount for targeted interventions."
-  ],
-  "filters": [
-    {"column": "Country", "filter_type": "dropdown", "label": "Country"},
-    {"column": "Customer Segment", "filter_type": "dropdown", "label": "Segment"}
-  ],
-  "kpis": [
-    {
-      "metric": "Invoice Amount",
-      "aggregation": "sum",
-      "label": "$Total Revenue"
-    }
-  ],
-  "charts": [
-    {
-      "chart_id": "chart-0",
-      "type": "line",
-      "x": "Invoice Date",
-      "y": "Invoice Amount",
-      "title": "Revenue Growth Over Time",
-      "size": "full"
-    },
-    {
-      "chart_id": "chart-1",
-      "type": "bar",
-      "x": "Country",
-      "y": "Invoice Amount",
-      "title": "Top Revenue Sources by Country",
-      "size": "1/2"
-    }
-  ],
-  "layout_grid": "3-col",
-  "narrative": "This dashboard reveals the robust revenue growth in Invoice Amount and enables deep-dive analysis into regional performance, providing actionable insights for strategic decision-making."
-}
-===========================
+    # Page content - changes based on URL
+    html.Div(id='page-content'),
+], style={'fontFamily': "'Segoe UI', Arial, sans-serif", 'backgroundColor': '#F7FAFC'})
 
-====CHARTS FROM LLM====
-[{'chart_id': 'chart-0', 'type': 'line', 'x': 'Invoice Date', 'y': 'Invoice Amount', 'title': 'Revenue Growth Over Time', 'size': 'full'}, {'chart_id': 'chart-1', 'type': 'bar', 'x': 'Country', 'y': 'Invoice Amount', 'title': 'Top Revenue Sources by Country', 'size': '1/2'}]
-====================
+# ═══════════════════════════════════════════════════════════════
+# CALLBACKS - ROUTING & AUTHENTICATION
+# ═══════════════════════════════════════════════════════════════
 
+# 🔐 SIGN IN CALLBACK - Validate against PostgreSQL database
+@app.callback(
+    Output('url', 'pathname', allow_duplicate=True),
+    Output('auth-message-container', 'children'),
+    Output('session-state', 'data', allow_duplicate=True),
+    Input('auth-btn-signin', 'n_clicks'),
+    State('auth-signin-username', 'value'),
+    State('auth-signin-password', 'value'),
+    State('session-state', 'data'),
+    prevent_initial_call=True
+)
+def handle_signin(n_clicks, username, password, session_data):
+    print(" Signin clicked", n_clicks, username)  # DEBUG
 
-====CONFIG_DICT====
-{'executive_summary': {'key_findings': ['Invoice Amount has increased by 15% YoY, indicating robust revenue growth.', 'Missing data in Invoice Date column affects temporal analysis with 2.1% missing entries.', 'The dataset shows a healthy overall health score of 92%, suggesting reliable insights.'], 'data_quality_score': 0.92, 'overall_health': 'Healthy', 'missing_data_pct': 2.1, 'reliability': 'High'}, 'trends': [{'column': 'Invoice Amount', 'direction': 'increasing', 'growth_rate': 0.15}], 'data_quality': {'missing_values': {'Invoice Date': 2.1}, 'outliers_detected': False, 'data_completeness': 0.98, 'recommendation': 'Data quality is high; proceed with confidence'}, 'insights': ['A significant rise in Invoice Amount suggests successful revenue generation strategies.', 'Executive teams should focus on analyzing regional performance through filters.'], 'recommendations': ['Enhance temporal analysis by addressing missing data in the Invoice Date column.', 'Investigate regions showing high variance in Invoice Amount for targeted interventions.'], 'filters': [{'column': 'Country', 'filter_type': 'dropdown', 'label': 'Country'}, {'column': 'Customer Segment', 'filter_type': 'dropdown', 'label': 'Segment'}], 'kpis': [{'metric': 'Invoice Amount', 'aggregation': 'sum', 'label': '$Total Revenue'}], 'charts': [{'chart_id': 'chart-0', 'type': 'line', 'x': 'Invoice Date', 'y': 'Invoice Amount', 'title': 'Revenue Growth Over Time', 'size': 'full'}, {'chart_id': 'chart-1', 'type': 'bar', 'x': 'Country', 'y': 'Invoice Amount', 'title': 'Top Revenue Sources by Country', 'size': '1/2'}], 'layout_grid': '3-col', 'narrative': 'This dashboard reveals the robust revenue growth in Invoice Amount and enables deep-dive analysis into regional performance, providing actionable insights for strategic decision-making.'}
-======================
-[OK] LLM analysis successful
-[INFO] LLM suggested: 2 filters, 1 KPIs, 2 charts
+    if not n_clicks:
+        raise dash.exceptions.PreventUpdate
 
-====CONFIG_DICT====
-{
-  "executive_summary": {
-    "key_findings": [
-      "Invoice Amount has increased by 15% YoY, indicating robust revenue growth.",
-      "Missing data in Invoice Date column affects temporal analysis with 2.1% missing entries.",
-      "The dataset shows a healthy overall health score of 92%, suggesting reliable insights."
-    ],
-    "data_quality_score": 0.92,
-    "overall_health": "Healthy",
-    "missing_data_pct": 2.1,
-    "reliability": "High"
-  },
-  "trends": [
-    {
-      "column": "Invoice Amount",
-      "direction": "increasing",
-      "growth_rate": 0.15
-    }
-  ],
-  "data_quality": {
-    "missing_values": {
-      "Invoice Date": 2.1
-    },
-    "outliers_detected": false,
-    "data_completeness": 0.98,
-    "recommendation": "Data quality is high; proceed with confidence"
-  },
-  "insights": [
-    "A significant rise in Invoice Amount suggests successful revenue generation strategies.",
-    "Executive teams should focus on analyzing regional performance through filters."
-  ],
-  "recommendations": [
-    "Enhance temporal analysis by addressing missing data in the Invoice Date column.",
-    "Investigate regions showing high variance in Invoice Amount for targeted interventions."
-  ],
-  "filters": [
-    {
-      "column": "Country",
-      "filter_type": "dropdown",
-      "label": "Country"
-    },
-    {
-      "column": "Customer Segment",
-      "filter_type": "dropdown",
-      "label": "Segment"
-    }
-  ],
-  "kpis": [
-    {
-      "metric": "Invoice Amount",
-      "aggregation": "sum",
-      "label": "$Total Revenue"
-    }
-  ],
-  "charts": [
-    {
-      "chart_id": "chart-0",
-      "type": "line",
-      "x": "Invoice Date",
-      "y": "Invoice Amount",
-      "title": "Revenue Growth Over Time",
-      "size": "full"
-    },
-    {
-      "chart_id": "chart-1",
-      "type": "bar",
-      "x": "Country",
-      "y": "Invoice Amount",
-      "title": "Top Revenue Sources by Country",
-      "size": "1/2"
-    }
-  ],
-  "layout_grid": "3-col",
-  "narrative": "This dashboard reveals the robust revenue growth in Invoice Amount and enables deep-dive analysis into regional performance, providing actionable insights for strategic decision-making."
-}
-=======================
+    if not username or not password:
+        return dash.no_update, dbc.Alert("Please enter username and password", color="warning"), dash.no_update
 
-FILTER RAW: {'column': 'Country', 'filter_type': 'dropdown', 'label': 'Country'}
-FILTER RAW: {'column': 'Customer Segment', 'filter_type': 'dropdown', 'label': 'Segment'}
-[WARN] Filter column 'Customer Segment' not found in dataset, skipping
-KPI RAW: {'metric': 'Invoice Amount', 'aggregation': 'sum', 'label': '$Total Revenue'}
-CHART RAW: {'chart_id': 'chart-0', 'type': 'line', 'x': 'Invoice Date', 'y': 'Invoice Amount', 'title': 'Revenue Growth Over Time', 'size': 'full'}
-CHART RAW: {'chart_id': 'chart-1', 'type': 'bar', 'x': 'Country', 'y': 'Invoice Amount', 'title': 'Top Revenue Sources by Country', 'size': '1/2'}
+    session_data = session_data or {}
 
-====FINAL CONFIG====
-Filters: 1
-KPIs: 1
-Charts: 2
-=======================
+    from core.auth import register_user, authenticate_user
+    result = authenticate_user(username, password)
 
-STEP 7 - AFTER ANALYZE
-<class 'core.config.DashboardConfig'>
-DashboardConfig(filters=[FilterConfig(column='Country', filter_type='dropdown', label='Country', default_value=None)], kpis=[KPIConfig(metric='Invoice Amount', aggregation='sum', label='$Total Revenue', color='#1A365D', bg_color='#EFF6FF')], charts=[ChartConfig(chart_id='chart-0', chart_type='line', x_column='Invoice Date', y_column='Invoice Amount', groupby_column=None, size='full', aggregation='sum', title='Revenue Growth Over Time'), ChartConfig(chart_id='chart-1', chart_type='bar', x_column='Country', y_column='Invoice Amount', groupby_column=None, size='1/2', aggregation='sum', title='Top Revenue Sources by Country')], layout_grid='3-col', reasoning='This dashboard reveals the robust revenue growth in Invoice Amount and enables deep-dive analysis into regional performance, providing actionable insights for strategic decision-making.')
-RESULT DIR
-['__annotations__', '__class__', '__dataclass_fields__', '__dataclass_params__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__match_args__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', 'charts', 'filters', 'kpis', 'layout_grid', 'reasoning', 'to_dict']
-TO DICT
-{'filters': [{'column': 'Country', 'filter_type': 'dropdown', 'label': 'Country'}], 'kpis': [{'metric': 'Invoice Amount', 'aggregation': 'sum', 'label': '$Total Revenue'}], 'charts': [{'chart_id': 'chart-0', 'chart_type': 'line', 'x': 'Invoice Date', 'y': 'Invoice Amount', 'groupby': None, 'aggregation': 'sum', 'size': 'full'}, {'chart_id': 'chart-1', 'chart_type': 'bar', 'x': 'Country', 'y': 'Invoice Amount', 'groupby': None, 'aggregation': 'sum', 'size': '1/2'}], 'layout_grid': '3-col', 'reasoning': 'This dashboard reveals the robust revenue growth in Invoice Amount and enables deep-dive analysis into regional performance, providing actionable insights for strategic decision-making.'}
-RETURNING TO STORE:
-<class 'str'>
-This dashboard reveals the robust revenue growth in Invoice Amount and enables deep-dive analysis into regional performance, providing actionable insights for strategic decision-making.
-RETURN TYPE: <class 'dict'>
-STORE DATA {'filters': [{'column': 'Country', 'filter_type': 'dropdown', 'label': 'Country'}], 'kpis': [{'metric': 'Invoice Amount', 'aggregation': 'sum', 'label': '$Total Revenue'}], 'charts': [{'chart_id': 'chart-0', 'chart_type': 'line', 'x': 'Invoice Date', 'y': 'Invoice Amount', 'groupby': None, 'aggregation': 'sum', 'size': 'full'}, {'chart_id': 'chart-1', 'chart_type': 'bar', 'x': 'Country', 'y': 'Invoice Amount', 'groupby': None, 'aggregation': 'sum', 'size': '1/2'}], 'layout_grid': '3-col', 'reasoning': 'This dashboard reveals the robust revenue growth in Invoice Amount and enables deep-dive analysis into regional performance, providing actionable insights for strategic decision-making.'}
-[OK] Loading active user upload: .cache/user_uploads\20260619-130326-468394e3.pkl
-[OK] Loaded 4,205 rows x 31 cols from user upload
-  - Client Name: categorical (cardinality=1202, missing=0.2%)
-  - Marsha: categorical (cardinality=555, missing=57.6%)
-  - Property Name: categorical (cardinality=451, missing=77.3%)
-  - Invoice No: categorical (cardinality=4198, missing=0.2%)
-  - Invoice Date: temporal (cardinality=528, missing=0.2%)
-  - Due Days: numeric (cardinality=528, missing=0.2%)
-  - Revenue Head: categorical (cardinality=26, missing=8.3%)
-  - Nature of Services: categorical (cardinality=6, missing=8.3%)
-  - Service: categorical (cardinality=48, missing=0.2%)
-  - Invoice Amount: numeric (cardinality=2017, missing=0.1%)
-  - Below 30 Days: numeric (cardinality=843, missing=0.1%)
-  - Overdue 30 - 60 Days: numeric (cardinality=440, missing=0.2%)
-  - Overdue 60 - 180 Days: numeric (cardinality=502, missing=0.2%)
-  - Overdue Above 180 Days: numeric (cardinality=249, missing=0.2%)
-  - Above 1 year: numeric (cardinality=292, missing=0.2%)
-  - Balance Collection Amount: numeric (cardinality=401, missing=0.2%)
-  - Credit Note Issued: numeric (cardinality=4, missing=0.2%)
-  - Balance Amount: numeric (cardinality=2376, missing=0.2%)
-  - Unnamed: 18: numeric (cardinality=173, missing=79.5%)
-  - Forex Balance Amount: numeric (cardinality=209, missing=0.2%)
-  - Particulars: categorical (cardinality=3881, missing=0.2%)
-  - Manager: categorical (cardinality=79, missing=0.2%)
-  - Partner: categorical (cardinality=10, missing=0.2%)
-  - Department: categorical (cardinality=8, missing=0.2%)
-  - Company Group: categorical (cardinality=5, missing=0.2%)
-  - Group: categorical (cardinality=275, missing=0.2%)
-  - Contact Person Name: categorical (cardinality=1194, missing=8.7%)
-  - Brand Name: categorical (cardinality=19, missing=98.1%)
-  - Project MID: categorical (cardinality=1881, missing=10.2%)
-  - Country: categorical (cardinality=43, missing=0.2%)
-  - GST NO: numeric (cardinality=569, missing=0.2%)
-[OK] Profiles cached to D:\veena.sharma\My Documents\GIT REPOSITORY\AI-Dashboard\.cache\profiles.json
+    # print(" Auth result:", result)  # DEBUG
 
-[INFO] Phase 1-2: Generating auto-layout...
-[OK] Generated comprehensive dashboard:
-  - Filters: 5
-  - KPIs: 4
-  - Charts: 12 (analyzing all column types)
-  - Layout: 3-col
-[OK] Auto-generated 12 charts, 5 filters, 4 KPIs
+    if result['success']:
+        result = authenticate_user(username, password)
 
-[WARN] Data Quality Issues:
-  - Marsha has 57.6% missing values
-  - Property Name has 77.3% missing values
-  - Unnamed: 18 has 79.5% missing values
-  - Brand Name has 98.1% missing values
-  - Due Days contains outliers (range: (3.0, 2180.0))
-  - Invoice Amount contains outliers (range: (0.0, 4588996.0))
-  - Below 30 Days contains outliers (range: (0.0, 4588996.0))
-  - Overdue 30 - 60 Days contains outliers (range: (0.0, 3466202.0))
-  - Overdue 60 - 180 Days contains outliers (range: (0.0, 1588918.98))
-  - Overdue Above 180 Days contains outliers (range: (0.0, 955800.0))
-  - Above 1 year contains outliers (range: (0.0, 575250.0))
-  - Balance Collection Amount contains outliers (range: (-3460974.0, 0.0))
-  - Credit Note Issued contains outliers (range: (-59590.0, 0.0))
-  - Balance Amount contains outliers (range: (-325914.44, 4568009.0))
-  - Unnamed: 18 contains outliers (range: (-91.7922933333333, 122.54))
-  - Forex Balance Amount contains outliers (range: (-3690.0, 17809.0))
+        if result['success']:
+            session_data.update({
+                "is_authenticated": True,
+                "username": result['user_data']['username'],
+                "user_id": result['user_data']['id'],
+                "email": result['user_data']['email'],
+                "name": result['user_data']['name'],
+                "role_id": result['user_data']['role_id']   # ✅ ADD THIS
+            })
 
-[OK] Found llm_config.json at: llm_config.json
-[OK] Loaded LLM config: provider=ollama
+            return '/upload', dash.no_update, session_data
 
-[INFO] Phase 3: Analyzing with LLM...
-[INFO] Using provider: ollama at https://ollama.osourceglobal.com:11434
-[INFO] Creating LLM provider and analyzer...
-[OK] LLM analyzer created successfully
-[INFO] Running startup LLM analysis...
-[INFO] Sending data to LLM for analysis...
+        # print("✅ LOGIN SUCCESS → redirecting")
 
-===PROMPT PREVIEW===
-You are a McKinsey-level data analytics consultant. Analyze this dataset comprehensively and generate a professional dashboard configuration with executive insights.
+        return '/upload', dash.no_update, session_data
 
-CONTEXT: Dataset contains 4,205 records with 31 columns.
-
-COLUMN PROFILES:
-{
-  "Client Name": {
-    "dtype": "categorical",
-    "cardinality": 1202,
-    "missing_pct": 0.2,
-    "range": null,
-    "top_values": [
-      "GRASIM INDS LTD",
-      "DUET INDIA HOTELS (CHENNAI OMR) PVT. LTD.",
-      "GRASIM INDUSTRIES LIMITED",
-      "PALLAZZIO HOTELS & LEISURE LTD.",
-      "GRASIM INDUSTRIES LIMITED, STAPLE FIBRE DIVISION, NAGDA"
-    ],
-    "is_temporal": false,
-    "has_outliers": false
-  },
-  "Marsha": {
-    "dtype": "categorical",
-    "cardinality": 555,
-    "missing_pct": 57.6,
-    "range": null,
-    "top_values": [
-      "MAAFO",
-      "BOMXR",
-      "IDRSI",
-      "DEDFI",
-      "."
-    ],
-    "is_temporal": false,
-    "has_outliers": false
-  },
-  "Property Name": {
-    "dtype": "categorical",
-    "cardinality": 451,
-    "missing_pct": 77.3,
-    "range": null,
-    "top_values": [
-      "Four Points by Sheraton Chennai OMR",
-      "The St. Regis Mumbai",
-      "Fairfield By Marriott Dehradun",
-      "FAIRFIELD BY MARRIOTT JAIPUR TONK ROAD",
-      "COURTYARD BY MARRIOTT RANCHI"
-    ],
-    "is_temporal": false,
-    "has_outliers": false
-  },
-  "Invoice No": {
-    "dtype": "categorical",
-    "cardinality": 4198,
-    "missing_pct": 0.2,
-    "range": null,
-    "top_values": [
-      "OSO2526-27011449",
-      "OSO2526-27040019",
-      "OSO2526-27040020",
-      "OSO2526-27011602",
-      "OSO2526-27020476"
-    ],
-    "is_temporal": false,
-    "has_outliers": false
-  },
-  "Invoice Date": {
-    "dtype": "temporal",
-    "cardinality": 528,
-    "missing_pct": 0.2,
-    "range": null,
-    "top_values": [
-      "2026-02-05",
-      "2026-03-06",
-      "2026-03-09",
-      "2026-03-05",
-      "2026-02-04"
-    ],
-    "is_temporal": true,
-    "has_outliers": false
-  },
-  "Due Days": {
-    "dtype": "numeric",
-    "cardinality": 528,
-    "missing_pct": 0.2,
-    "range": [
-      3.0,
-      2180.0
-    ],
-    "top_values": [
-      "39.0",
-      "10.0",
-      "7.0",
-      "11.0",
-      "40.0"
-    ],
-    "is_temporal": false,
-    "has_outliers": "True"
-  },
-  "Revenue Head": {
-    "dtype": "categorical",
-    "cardinality": 26,
-    "missing_pct": 8.3,
-    "range": null,
-    "top_values": [
-      "Payroll Management",
-      "SAM",
-      "DMS",
-      "HRMS",
-      "Recon Tool"
-    ],
-    "is_temporal": false,
-    "has_outliers": false
-  },
-  "Nature of Services": {
-    "dtype": "categorical",
-    "cardinality": 6,
-    "missing_pct": 8.3,
-    "range": null,
-    "top_values": [
-      "Local",
-      "Export",
-      "Exempt",
-      "ON ACCOUNT",
-      "LOCAL"
-    ],
-    "is_temporal": false,
-    "has_outliers": false
-  },
-  "Service": {
-    "dtype": "categorical",
-    "cardinality": 48,
-    "missing_pct": 0.2,
-    "range": null,
-    "top_values": [
-      "PAYROLL",
-      "GREEN SAM",
-      "HRMS",
-      "ON ACCOUNT",
-
-===END PROMPT===
-
-[INFO] Calling Ollama at https://ollama.osourceglobal.com:11434...
-[INFO] Using model: qwen2.5:14b
-[INFO] Testing connectivity (10s timeout)...
-[OK] Ollama server is responding
-[INFO] Sending analysis request (timeout: 300s)...
+    #  failure
+    return dash.no_update, dbc.Alert(result['message'], color="danger"), dash.no_update
