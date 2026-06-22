@@ -1,447 +1,132 @@
-REGISTERING UPDATE_CHARTS CALLBACK
- Signin clicked 0 None
-[OK] App DB connected: 192.168.202.114:5432
- Signin clicked 1 veenash
-[AUTH] Login attempt: veenash
-[OK] Login success: veenash
-[AUTH] Login attempt: veenash
-[OK] Login success: veenash
-[OK] Upload saved: 20260619-180755-cfa9d963 (4,205 rows)
-SKIPPING INITIAL LOAD
-================================================================================
-AI CALLBACK FIRED
-N_CLICKS: 1
-TIME: 1781872741.2750504
-================================================================================
-STEP 1- CALLBACK STARTED
-DF_JSON IS NONE: False
-DF_JSON LENGTH: 1930659
-STEP 3- BEFORE READ_JSON
-DF_JSON TYPE: <class 'str'>
-DF_JSON PREVIEW: {"columns":["Client Name","Marsha","Property Name","Invoice No","Invoice Date","Due Days","Revenue Head","Nature of Services","Service","Invoice Amount","Below 30 Days","Overdue 30 - 60 Days","Overdue
-STEP 4- AFTER READ_JSON
-(4205, 31)
-STEP 5 - SUMMARY CREATED
-{'columns': ['Client Name', 'Marsha', 'Property Name', 'Invoice No', 'Invoice Date', 'Due Days', 'Revenue Head', 'Nature of Services', 'Service', 'Invoice Amount', 'Below 30 Days', 'Overdue 30 - 60 Days', 'Overdue 60 - 180 Days', 'Overdue Above 180 Days', 'Above 1 year', 'Balance Collection Amount', 'Credit Note Issued', 'Balance Amount', 'Unnamed: 18', 'Forex Balance Amount', 'Particulars', 'Manager', 'Partner', 'Department', 'Company Group', 'Group', 'Contact Person Name', 'Brand Name', 'Project MID', 'Country', 'GST NO'], 'row_count': 4205, 'numeric_columns': ['Invoice Date', 'Due Days', 'Invoice Amount', 'Below 30 Days', 'Overdue 30 - 60 Days', 'Overdue 60 - 180 Days', 'Overdue Above 180 Days', 'Above 1 year', 'Balance Collection Amount', 'Credit Note Issued', 'Balance Amount', 'Unnamed: 18', 'Forex Balance Amount'], 'categorical_columns': ['Client Name', 'Marsha', 'Property Name', 'Invoice No', 'Revenue Head', 'Nature of Services', 'Service', 'Particulars', 'Manager', 'Partner', 'Department', 'Company Group', 'Group', 'Contact Person Name', 'Brand Name', 'Project MID', 'Country', 'GST NO']}
-STEP 6 - BEFORE ANALYZE
-[INFO] Sending data to LLM for analysis...
+"""
+Save and load dashboard configurations using DATABASE (ORM)
+"""
 
-===PROMPT PREVIEW===
-You are a McKinsey-level data analytics consultant. Analyze this dataset comprehensively and generate a professional dashboard configuration with executive insights.
-
-CONTEXT: No additional context provided
-
-COLUMN PROFILES:
-{
-  "Client Name": {
-    "dtype": "categorical",
-    "cardinality": 1202,
-    "missing_pct": 0.2,
-    "range": null,
-    "top_values": [
-      "GRASIM INDS LTD",
-      "DUET INDIA HOTELS (CHENNAI OMR) PVT. LTD.",
-      "GRASIM INDUSTRIES LIMITED",
-      "PALLAZZIO HOTELS & LEISURE LTD.",
-      "GRASIM INDUSTRIES LIMITED, STAPLE FIBRE DIVISION, NAGDA"
-    ],
-    "is_temporal": false,
-    "has_outliers": false
-  },
-  "Marsha": {
-    "dtype": "categorical",
-    "cardinality": 555,
-    "missing_pct": 57.6,
-    "range": null,
-    "top_values": [
-      "MAAFO",
-      "BOMXR",
-      "IDRSI",
-      "DEDFI",
-      "."
-    ],
-    "is_temporal": false,
-    "has_outliers": false
-  },
-  "Property Name": {
-    "dtype": "categorical",
-    "cardinality": 451,
-    "missing_pct": 77.3,
-    "range": null,
-    "top_values": [
-      "Four Points by Sheraton Chennai OMR",
-      "The St. Regis Mumbai",
-      "Fairfield By Marriott Dehradun",
-      "FAIRFIELD BY MARRIOTT JAIPUR TONK ROAD",
-      "COURTYARD BY MARRIOTT RANCHI"
-    ],
-    "is_temporal": false,
-    "has_outliers": false
-  },
-  "Invoice No": {
-    "dtype": "categorical",
-    "cardinality": 4198,
-    "missing_pct": 0.2,
-    "range": null,
-    "top_values": [
-      "OSO2526-27011449",
-      "OSO2526-27040019",
-      "OSO2526-27040020",
-      "OSO2526-27011602",
-      "OSO2526-27020476"
-    ],
-    "is_temporal": false,
-    "has_outliers": false
-  },
-  "Invoice Date": {
-    "dtype": "temporal",
-    "cardinality": 528,
-    "missing_pct": 0.2,
-    "range": null,
-    "top_values": [
-      "2026-02-05",
-      "2026-03-06",
-      "2026-03-09",
-      "2026-03-05",
-      "2026-02-04"
-    ],
-    "is_temporal": true,
-    "has_outliers": false
-  },
-  "Due Days": {
-    "dtype": "numeric",
-    "cardinality": 528,
-    "missing_pct": 0.2,
-    "range": null,
-    "top_values": [
-      "39.0",
-      "10.0",
-      "7.0",
-      "11.0",
-      "40.0"
-    ],
-    "is_temporal": false,
-    "has_outliers": false
-  },
-  "Revenue Head": {
-    "dtype": "categorical",
-    "cardinality": 26,
-    "missing_pct": 8.3,
-    "range": null,
-    "top_values": [
-      "Payroll Management",
-      "SAM",
-      "DMS",
-      "HRMS",
-      "Recon Tool"
-    ],
-    "is_temporal": false,
-    "has_outliers": false
-  },
-  "Nature of Services": {
-    "dtype": "categorical",
-    "cardinality": 6,
-    "missing_pct": 8.3,
-    "range": null,
-    "top_values": [
-      "Local",
-      "Export",
-      "Exempt",
-      "ON ACCOUNT",
-      "LOCAL"
-    ],
-    "is_temporal": false,
-    "has_outliers": false
-  },
-  "Service": {
-    "dtype": "categorical",
-    "cardinality": 48,
-    "missing_pct": 0.2,
-    "range": null,
-    "top_values": [
-      "PAYROLL",
-      "GREEN SAM",
-      "HRMS",
-      "ON ACCOUNT",
-      "PROJECT TREE"
-    ],
-    "is_temporal"
-===END PROMPT===
-
-[INFO] Calling Ollama at https://ollama.osourceglobal.com:11434...
-[INFO] Using model: qwen2.5:14b
-[INFO] Testing connectivity (10s timeout)...
-[OK] Ollama server is responding
-[INFO] Sending analysis request (timeout: 300s)...
-[DEBUG] Response status: 200
-
-===OLLAMA RESPONSE===
-{
-  "executive_summary": {
-    "key_findings": [
-      "Invoice Amount has declined by 12% YoY in Q3",
-      "95% data completeness indicates a reliable dataset",
-      "Top regions contribute to 70% of Invoice Amount"
-    ],
-    "data_quality_score": 0.95,
-    "overall_health": "Healthy",
-    "missing_data_pct": 2.1,
-    "reliability": "High"
-  },
-  "trends": [
-    {"column": "Invoice Amount", "direction": "decreasing", "growth_rate": -0.12},
-    {"column": "Invoice Date", "direction": "increasing", "growth_rate": 0.15}
-  ],
-  "data_quality": {
-    "missing_values": {"Invoice Amount": 2.1, "Invoice Date": 1.2},
-    "outliers_detected": false,
-    "data_completeness": 0.98,
-    "recommendation": "Data quality is high; proceed with confidence"
-  },
-  "insights": [
-    "Top regions contribute significantly to the total Invoice Amount",
-    "Invoice Date trend shows a steady increase in volume over time"
-  ],
-  "recommendations": [
-    "Focus on improving performance in declining regions",
-    "Analyze seasonal trends for better resource allocation"
-  ],
-  "filters": [
-    {"column": "CustomerName", "filter_type": "dropdown", "label": "Top Customers"},
-    {"column": "Country", "filter_type": "dropdown", "label": "Regions"}
-  ],
-  "kpis": [
-    {"metric": "Invoice Amount", "aggregation": "sum", "label": "Total Invoice Amount"}
-  ],
-  "charts": [
-    {
-      "chart_id": "chart-0",
-      "type": "line",
-      "x": "Invoice Date",
-      "y": "Invoice Amount",
-      "title": "Trend of Invoice Amount Over Time",
-      "size": "full"
-    },
-    {
-      "chart_id": "chart-1",
-      "type": "bar",
-      "x": "Country",
-      "y": "Invoice Amount",
-      "title": "Top Countries by Invoice Amount",
-      "size": "1/2"
-    },
-    {
-      "chart_id": "chart-2",
-      "type": "pie",
-      "x": "CustomerName",
-      "y": "Invoice Amount",
-      "title": "Distribution of Invoice Amount Across Top Customers",
-      "size": "1/3"
-    }
-  ],
-  "layout_grid": "2-col",
-  "narrative": "This dashboard provides a comprehensive view of the financial performance, highlighting trends and key contributors. It enables quick identification of underperforming regions and seasonal patterns."
-}
-=====================
-
-[OK] Ollama response received
-
-====RAW LLM RESPONSE====
-{
-  "executive_summary": {
-    "key_findings": [
-      "Invoice Amount has declined by 12% YoY in Q3",
-      "95% data completeness indicates a reliable dataset",
-      "Top regions contribute to 70% of Invoice Amount"
-    ],
-    "data_quality_score": 0.95,
-    "overall_health": "Healthy",
-    "missing_data_pct": 2.1,
-    "reliability": "High"
-  },
-  "trends": [
-    {"column": "Invoice Amount", "direction": "decreasing", "growth_rate": -0.12},
-    {"column": "Invoice Date", "direction": "increasing", "growth_rate": 0.15}
-  ],
-  "data_quality": {
-    "missing_values": {"Invoice Amount": 2.1, "Invoice Date": 1.2},
-    "outliers_detected": false,
-    "data_completeness": 0.98,
-    "recommendation": "Data quality is high; proceed with confidence"
-  },
-  "insights": [
-    "Top regions contribute significantly to the total Invoice Amount",
-    "Invoice Date trend shows a steady increase in volume over time"
-  ],
-  "recommendations": [
-    "Focus on improving performance in declining regions",
-    "Analyze seasonal trends for better resource allocation"
-  ],
-  "filters": [
-    {"column": "CustomerName", "filter_type": "dropdown", "label": "Top Customers"},
-    {"column": "Country", "filter_type": "dropdown", "label": "Regions"}
-  ],
-  "kpis": [
-    {"metric": "Invoice Amount", "aggregation": "sum", "label": "Total Invoice Amount"}
-  ],
-  "charts": [
-    {
-      "chart_id": "chart-0",
-      "type": "line",
-      "x": "Invoice Date",
-      "y": "Invoice Amount",
-      "title": "Trend of Invoice Amount Over Time",
-      "size": "full"
-    },
-    {
-      "chart_id": "chart-1",
-      "type": "bar",
-      "x": "Country",
-      "y": "Invoice Amount",
-      "title": "Top Countries by Invoice Amount",
-      "size": "1/2"
-    },
-    {
-      "chart_id": "chart-2",
-      "type": "pie",
-      "x": "CustomerName",
-      "y": "Invoice Amount",
-      "title": "Distribution of Invoice Amount Across Top Customers",
-      "size": "1/3"
-    }
-  ],
-  "layout_grid": "2-col",
-  "narrative": "This dashboard provides a comprehensive view of the financial performance, highlighting trends and key contributors. It enables quick identification of underperforming regions and seasonal patterns."
-}
-===========================
-
-====CHARTS FROM LLM====
-[{'chart_id': 'chart-0', 'type': 'line', 'x': 'Invoice Date', 'y': 'Invoice Amount', 'title': 'Trend of Invoice Amount Over Time', 'size': 'full'}, {'chart_id': 'chart-1', 'type': 'bar', 'x': 'Country', 'y': 'Invoice Amount', 'title': 'Top Countries by Invoice Amount', 'size': '1/2'}, {'chart_id': 'chart-2', 'type': 'pie', 'x': 'CustomerName', 'y': 'Invoice Amount', 'title': 'Distribution of Invoice Amount Across Top Customers', 'size': '1/3'}]
-====================
+from core.app_db import SavedDashboard
+from core.db_connector import get_session
+from datetime import datetime
 
 
-====CONFIG_DICT====
-{'executive_summary': {'key_findings': ['Invoice Amount has declined by 12% YoY in Q3', '95% data completeness indicates a reliable dataset', 'Top regions contribute to 70% of Invoice Amount'], 'data_quality_score': 0.95, 'overall_health': 'Healthy', 'missing_data_pct': 2.1, 'reliability': 'High'}, 'trends': [{'column': 'Invoice Amount', 'direction': 'decreasing', 'growth_rate': -0.12}, {'column': 'Invoice Date', 'direction': 'increasing', 'growth_rate': 0.15}], 'data_quality': {'missing_values': {'Invoice Amount': 2.1, 'Invoice Date': 1.2}, 'outliers_detected': False, 'data_completeness': 0.98, 'recommendation': 'Data quality is high; proceed with confidence'}, 'insights': ['Top regions contribute significantly to the total Invoice Amount', 'Invoice Date trend shows a steady increase in volume over time'], 'recommendations': ['Focus on improving performance in declining regions', 'Analyze seasonal trends for better resource allocation'], 'filters': [{'column': 'CustomerName', 'filter_type': 'dropdown', 'label': 'Top Customers'}, {'column': 'Country', 'filter_type': 'dropdown', 'label': 'Regions'}], 'kpis': [{'metric': 'Invoice Amount', 'aggregation': 'sum', 'label': 'Total Invoice Amount'}], 'charts': [{'chart_id': 'chart-0', 'type': 'line', 'x': 'Invoice Date', 'y': 'Invoice Amount', 'title': 'Trend of Invoice Amount Over Time', 'size': 'full'}, {'chart_id': 'chart-1', 'type': 'bar', 'x': 'Country', 'y': 'Invoice Amount', 'title': 'Top Countries by Invoice Amount', 'size': '1/2'}, {'chart_id': 'chart-2', 'type': 'pie', 'x': 'CustomerName', 'y': 'Invoice Amount', 'title': 'Distribution of Invoice Amount Across Top Customers', 'size': '1/3'}], 'layout_grid': '2-col', 'narrative': 'This dashboard provides a comprehensive view of the financial performance, highlighting trends and key contributors. It enables quick identification of underperforming regions and seasonal patterns.'}
-======================
-[OK] LLM analysis successful
-[INFO] LLM suggested: 2 filters, 1 KPIs, 3 charts
+# ✅ SAVE to database
+def save(name: str, user_id: int, upload_id: int,
+         kpi_selections: list, filter_selections: list,
+         confirmed_dtypes: dict, ai_suggestions: dict = None):
 
-====CONFIG_DICT====
-{
-  "executive_summary": {
-    "key_findings": [
-      "Invoice Amount has declined by 12% YoY in Q3",
-      "95% data completeness indicates a reliable dataset",
-      "Top regions contribute to 70% of Invoice Amount"
-    ],
-    "data_quality_score": 0.95,
-    "overall_health": "Healthy",
-    "missing_data_pct": 2.1,
-    "reliability": "High"
-  },
-  "trends": [
-    {
-      "column": "Invoice Amount",
-      "direction": "decreasing",
-      "growth_rate": -0.12
-    },
-    {
-      "column": "Invoice Date",
-      "direction": "increasing",
-      "growth_rate": 0.15
-    }
-  ],
-  "data_quality": {
-    "missing_values": {
-      "Invoice Amount": 2.1,
-      "Invoice Date": 1.2
-    },
-    "outliers_detected": false,
-    "data_completeness": 0.98,
-    "recommendation": "Data quality is high; proceed with confidence"
-  },
-  "insights": [
-    "Top regions contribute significantly to the total Invoice Amount",
-    "Invoice Date trend shows a steady increase in volume over time"
-  ],
-  "recommendations": [
-    "Focus on improving performance in declining regions",
-    "Analyze seasonal trends for better resource allocation"
-  ],
-  "filters": [
-    {
-      "column": "CustomerName",
-      "filter_type": "dropdown",
-      "label": "Top Customers"
-    },
-    {
-      "column": "Country",
-      "filter_type": "dropdown",
-      "label": "Regions"
-    }
-  ],
-  "kpis": [
-    {
-      "metric": "Invoice Amount",
-      "aggregation": "sum",
-      "label": "Total Invoice Amount"
-    }
-  ],
-  "charts": [
-    {
-      "chart_id": "chart-0",
-      "type": "line",
-      "x": "Invoice Date",
-      "y": "Invoice Amount",
-      "title": "Trend of Invoice Amount Over Time",
-      "size": "full"
-    },
-    {
-      "chart_id": "chart-1",
-      "type": "bar",
-      "x": "Country",
-      "y": "Invoice Amount",
-      "title": "Top Countries by Invoice Amount",
-      "size": "1/2"
-    },
-    {
-      "chart_id": "chart-2",
-      "type": "pie",
-      "x": "CustomerName",
-      "y": "Invoice Amount",
-      "title": "Distribution of Invoice Amount Across Top Customers",
-      "size": "1/3"
-    }
-  ],
-  "layout_grid": "2-col",
-  "narrative": "This dashboard provides a comprehensive view of the financial performance, highlighting trends and key contributors. It enables quick identification of underperforming regions and seasonal patterns."
-}
-=======================
+    session = get_session()
 
-FILTER RAW: {'column': 'CustomerName', 'filter_type': 'dropdown', 'label': 'Top Customers'}
-[WARN] Filter column 'CustomerName' not found in dataset, skipping
-FILTER RAW: {'column': 'Country', 'filter_type': 'dropdown', 'label': 'Regions'}
-KPI RAW: {'metric': 'Invoice Amount', 'aggregation': 'sum', 'label': 'Total Invoice Amount'}
-CHART RAW: {'chart_id': 'chart-0', 'type': 'line', 'x': 'Invoice Date', 'y': 'Invoice Amount', 'title': 'Trend of Invoice Amount Over Time', 'size': 'full'}
-CHART RAW: {'chart_id': 'chart-1', 'type': 'bar', 'x': 'Country', 'y': 'Invoice Amount', 'title': 'Top Countries by Invoice Amount', 'size': '1/2'}
-CHART RAW: {'chart_id': 'chart-2', 'type': 'pie', 'x': 'CustomerName', 'y': 'Invoice Amount', 'title': 'Distribution of Invoice Amount Across Top Customers', 'size': '1/3'}
-[WARN] Chart x_column 'CustomerName' not found, skipping chart 2
+    try:
+        dashboard = SavedDashboard(
+            user_id=user_id,
+            upload_id=upload_id,
+            dashboard_name=name,
+            kpi_selections=kpi_selections or [],
+            filter_selections=filter_selections or [],
+            confirmed_dtypes=confirmed_dtypes or {},
+            ai_suggestions=ai_suggestions or {},
+            created_at=datetime.utcnow()
+        )
 
-====FINAL CONFIG====
-Filters: 1
-KPIs: 1
-Charts: 2
-=======================
+        session.add(dashboard)
+        session.commit()
 
-STEP 7 - AFTER ANALYZE
-<class 'core.config.DashboardConfig'>
-DashboardConfig(filters=[FilterConfig(column='Country', filter_type='dropdown', label='Regions', default_value=None)], kpis=[KPIConfig(metric='Invoice Amount', aggregation='sum', label='Total Invoice Amount', color='#1A365D', bg_color='#EFF6FF')], charts=[ChartConfig(chart_id='chart-0', chart_type='line', x_column='Invoice Date', y_column='Invoice Amount', groupby_column=None, size='full', aggregation='sum', title='Trend of Invoice Amount Over Time'), ChartConfig(chart_id='chart-1', chart_type='bar', x_column='Country', y_column='Invoice Amount', groupby_column=None, size='1/2', aggregation='sum', title='Top Countries by Invoice Amount')], layout_grid='2-col', reasoning='This dashboard provides a comprehensive view of the financial performance, highlighting trends and key contributors. It enables quick identification of underperforming regions and seasonal patterns.')
-RESULT DIR
-['__annotations__', '__class__', '__dataclass_fields__', '__dataclass_params__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__match_args__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', 'charts', 'filters', 'kpis', 'layout_grid', 'reasoning', 'to_dict']
-TO DICT
-{'filters': [{'column': 'Country', 'filter_type': 'dropdown', 'label': 'Regions'}], 'kpis': [{'metric': 'Invoice Amount', 'aggregation': 'sum', 'label': 'Total Invoice Amount'}], 'charts': [{'chart_id': 'chart-0', 'chart_type': 'line', 'x': 'Invoice Date', 'y': 'Invoice Amount', 'groupby': None, 'aggregation': 'sum', 'size': 'full'}, {'chart_id': 'chart-1', 'chart_type': 'bar', 'x': 'Country', 'y': 'Invoice Amount', 'groupby': None, 'aggregation': 'sum', 'size': '1/2'}], 'layout_grid': '2-col', 'reasoning': 'This dashboard provides a comprehensive view of the financial performance, highlighting trends and key contributors. It enables quick identification of underperforming regions and seasonal patterns.'}
-RETURNING TO STORE:
-<class 'str'>
-This dashboard provides a comprehensive view of the financial performance, highlighting trends and key contributors. It enables quick identification of underperforming regions and seasonal patterns.
-RETURN TYPE: <class 'dict'>
-STORE DATA {'filters': [{'column': 'Country', 'filter_type': 'dropdown', 'label': 'Regions'}], 'kpis': [{'metric': 'Invoice Amount', 'aggregation': 'sum', 'label': 'Total Invoice Amount'}], 'charts': [{'chart_id': 'chart-0', 'chart_type': 'line', 'x': 'Invoice Date', 'y': 'Invoice Amount', 'groupby': None, 'aggregation': 'sum', 'size': 'full'}, {'chart_id': 'chart-1', 'chart_type': 'bar', 'x': 'Country', 'y': 'Invoice Amount', 'groupby': None, 'aggregation': 'sum', 'size': '1/2'}], 'layout_grid': '2-col', 'reasoning': 'This dashboard provides a comprehensive view of the financial performance, highlighting trends and key contributors. It enables quick identification of underperforming regions and seasonal patterns.'}
+        print(f"[OK] Dashboard saved: {name}")
+
+        return {
+            "success": True,
+            "dashboard_id": dashboard.dashboard_id
+        }
+
+    except Exception as e:
+        session.rollback()
+        print(f"[ERROR] save dashboard: {e}")
+        return {"success": False, "message": "Failed to save dashboard"}
+
+    finally:
+        session.close()
+
+
+# ✅ LIST dashboards
+def list_saved(user_id: int):
+    session = get_session()
+
+    try:
+        dashboards = (
+            session.query(SavedDashboard)
+            .filter_by(user_id=user_id)
+            .order_by(SavedDashboard.created_at.desc())
+            .all()
+        )
+
+        return [
+            {
+                "dashboard_id": d.dashboard_id,
+                "name": d.dashboard_name,
+                "created_at": d.created_at.isoformat() if d.created_at else None
+            }
+            for d in dashboards
+        ]
+
+    except Exception as e:
+        print(f"[ERROR] list dashboards: {e}")
+        return []
+
+    finally:
+        session.close()
+
+
+# ✅ LOAD dashboard
+def load(dashboard_id: int, user_id: int):
+    session = get_session()
+
+    try:
+        dashboard = session.query(SavedDashboard).filter_by(
+            dashboard_id=dashboard_id,
+            user_id=user_id
+        ).first()
+
+        if not dashboard:
+            return None
+
+        return {
+            "name": dashboard.dashboard_name,
+            "kpi_selections": dashboard.kpi_selections,
+            "filter_selections": dashboard.filter_selections,
+            "confirmed_dtypes": dashboard.confirmed_dtypes,
+            "ai_suggestions": dashboard.ai_suggestions,
+        }
+
+    except Exception as e:
+        print(f"[ERROR] load dashboard: {e}")
+        return None
+
+    finally:
+        session.close()
+
+
+# ✅ DELETE dashboard
+def delete(dashboard_id: int, user_id: int):
+    session = get_session()
+
+    try:
+        dashboard = session.query(SavedDashboard).filter_by(
+            dashboard_id=dashboard_id,
+            user_id=user_id
+        ).first()
+
+        if not dashboard:
+            return False
+
+        session.delete(dashboard)
+        session.commit()
+
+        print(f"[OK] Dashboard deleted: {dashboard_id}")
+
+        return True
+
+    except Exception as e:
+        session.rollback()
+        print(f"[ERROR] delete dashboard: {e}")
+        return False
+
+    finally:
+        session.close()
